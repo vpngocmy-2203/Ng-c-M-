@@ -8,15 +8,25 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght=500;700&display=swap" rel="stylesheet">
     <style>
+        /* Thiết lập các biến màu sắc cốt lõi mặc định (Theme Hồng) */
+        :root {
+            --theme-primary: #ec4899;      /* Hồng gốc (pink-500) */
+            --theme-primary-hover: #be185d;/* Hồng đậm (pink-700) */
+            --theme-light: #fdf2f8;        /* Hồng siêu nhạt (pink-50) */
+            --theme-border: #fbcfe8;       /* Hồng nhạt làm border (pink-200) */
+            --theme-btn-default: #f472b6;  /* Màu nút đầu mèo lúc bình thường (pink-400) */
+            --theme-ring: #fce7f3;         /* Màu vòng ring ngoài nút (pink-100) */
+        }
+
         body { font-family: 'Comfortaa', cursive, sans-serif; transition: background-color 0.5s ease; }
         .correct { color: #10B981; font-weight: bold; }
         .incorrect { color: #EF4444; font-weight: bold; text-decoration: line-through; }
         
-        /* Hiệu ứng tai mèo ở phía trên chiếc hộp đựng ứng dụng */
+        /* Hiệu ứng tai mèo sử dụng biến màu border động để đồng bộ màu */
         .cat-box::before {
             content: "▲";
             color: white;
-            text-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+            text-shadow: 0 -4px 0 var(--theme-border);
             font-size: 38px;
             position: absolute;
             top: -28px;
@@ -25,7 +35,7 @@
         .cat-box::after {
             content: "▲";
             color: white;
-            text-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+            text-shadow: 0 -4px 0 var(--theme-border);
             font-size: 38px;
             position: absolute;
             top: -28px;
@@ -37,7 +47,7 @@
             position: relative;
             width: 120px;
             height: 100px;
-            background-color: #f472b6; /* bg-pink-400 */
+            background-color: var(--theme-btn-default); /* Đồng bộ màu theo biến */
             border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -46,7 +56,7 @@
             align-items: center;
             justify-content: center;
             border: none;
-            box-shadow: 0 8px 15px rgba(244, 114, 182, 0.3);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
 
         /* Tai mèo bên trái và bên phải */
@@ -108,6 +118,13 @@
         .animate-shake {
             animation: meow-shake 0.4s ease-in-out;
         }
+
+        /* Lớp màu động ép buộc theo biến CSS */
+        .dynamic-text-primary { color: var(--theme-primary) !important; }
+        .dynamic-text-hover:hover { color: var(--theme-primary-hover) !important; }
+        .dynamic-bg-light { background-color: var(--theme-light) !important; }
+        .dynamic-border-theme { border-color: var(--theme-border) !important; }
+        .dynamic-ring-theme { --tw-ring-color: var(--theme-ring) !important; }
     </style>
 </head>
 <body class="bg-pink-100/60 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
@@ -115,13 +132,13 @@
     <canvas id="cat-bg-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
 
     <div class="absolute top-4 right-4 z-30">
-        <button onclick="toggleThemeMenu()" class="bg-white/80 backdrop-blur-xs p-2 rounded-full shadow-md hover:scale-110 active:scale-95 transition-all text-gray-500 hover:text-pink-500 cursor-pointer">
+        <button onclick="toggleThemeMenu()" class="bg-white/80 backdrop-blur-xs p-2 rounded-full shadow-md hover:scale-110 active:scale-95 transition-all text-gray-500 dynamic-text-hover cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-[spin_8s_linear_infinite]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
         </button>
-        <div id="theme-menu" class="hidden absolute right-0 mt-2 bg-white/95 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-pink-100 min-w-[160px] space-y-2">
+        <div id="theme-menu" class="hidden absolute right-0 mt-2 bg-white/95 backdrop-blur-md p-3 rounded-2xl shadow-xl border dynamic-border-theme min-w-[160px] space-y-2">
             <p class="text-[11px] font-bold text-gray-400 text-center mb-1">Màu nền Meow 🐾</p>
             <button onclick="changeTheme('pink')" class="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-xl hover:bg-pink-50 text-pink-600 font-bold transition-colors cursor-pointer">
                 <span class="w-4 h-4 rounded-full bg-pink-300 border border-pink-400"></span> Hồng Sữa
@@ -138,28 +155,28 @@
         </div>
     </div>
 
-    <div class="cat-box bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border-4 border-pink-200 relative z-10">
+    <div class="cat-box bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border-4 dynamic-border-theme relative z-10 transition-all duration-500">
         
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-bold text-pink-500 flex items-center gap-1.5">
+            <h1 class="text-xl font-bold dynamic-text-primary flex items-center gap-1.5">
                 <span>🐱</span> Meow Coach
             </h1>
-            <span id="progress-text" class="text-xs bg-pink-200 text-pink-700 px-3 py-1 rounded-full font-bold shadow-xs">Câu 1/9</span>
+            <span id="progress-text" class="text-xs dynamic-bg-light dynamic-text-primary px-3 py-1 rounded-full font-bold shadow-xs">Câu 1/9</span>
         </div>
         
         <div class="mb-6">
             <div class="flex justify-between items-center mb-1">
-                <p class="text-xs text-pink-400 font-bold flex items-center gap-1">🐾 Thử thách phát âm Mỹ:</p>
-                <button onclick="speakCurrentSentence()" class="text-xs text-pink-500 hover:text-pink-700 font-bold flex items-center gap-0.5 transition-colors">
+                <p class="text-xs dynamic-text-primary opacity-80 font-bold flex items-center gap-1">🐾 Thử thách phát âm Mỹ:</p>
+                <button onclick="speakCurrentSentence()" class="text-xs dynamic-text-primary dynamic-text-hover font-bold flex items-center gap-0.5 transition-colors">
                     🔊 Nghe mẫu
                 </button>
             </div>
-            <div id="target-text" class="text-lg font-bold text-gray-700 bg-pink-50 p-4 rounded-2xl border-2 border-dashed border-pink-200 min-h-[60px] flex items-center relative">
+            <div id="target-text" class="text-lg font-bold text-gray-700 dynamic-bg-light p-4 rounded-2xl border-2 border-dashed dynamic-border-theme min-h-[60px] flex items-center relative">
                 Loading...
             </div>
             <div class="flex justify-between items-center mt-2">
                 <span id="auto-next-status" class="text-xs text-emerald-500 font-bold animate-pulse hidden">✨ Meo! Xuất sắc >90%! Đổi câu...</span>
-                <button onclick="changeSentence()" class="text-xs text-pink-400 hover:text-pink-600 font-bold ml-auto transition-colors">
+                <button onclick="changeSentence()" class="text-xs dynamic-text-primary opacity-80 dynamic-text-hover font-bold ml-auto transition-colors">
                     Next câu khác 🐾
                 </button>
             </div>
@@ -167,7 +184,7 @@
 
         <div class="flex flex-col items-center justify-center gap-3 my-8">
             <div class="relative pt-4"> 
-                <button id="btn-record" onclick="handleCatButtonClick()" class="cat-head-btn text-white focus:outline-none ring-8 ring-pink-100 hover:scale-105 transition-all">
+                <button id="btn-record" onclick="handleCatButtonClick()" class="cat-head-btn text-white focus:outline-none ring-8 dynamic-ring-theme hover:scale-105 transition-all">
                     <div class="cat-eyes"></div>
                     <div class="cat-whiskers-l"></div>
                     <div class="cat-whiskers-r"></div>
@@ -178,10 +195,10 @@
                     <span id="btn-text" class="text-[9px] font-black tracking-wider z-10 uppercase">BẤM HỌC</span>
                 </button>
             </div>
-            <p id="status" class="text-xs text-pink-400 font-bold text-center mt-3 bg-pink-50/80 px-4 py-1 rounded-full">Nhấn đầu mèo, mèo sẽ đọc mẫu rồi sen đọc theo nhé!</p>
+            <p id="status" class="text-xs dynamic-text-primary font-bold text-center mt-3 dynamic-bg-light/80 px-4 py-1 rounded-full">Nhấn đầu mèo, mèo sẽ đọc mẫu rồi sen đọc theo nhé!</p>
         </div>
 
-        <div class="space-y-4 pt-4 border-t-2 border-dashed border-pink-100">
+        <div class="space-y-4 pt-4 border-t-2 border-dashed dynamic-border-theme">
             <div>
                 <p class="text-xs text-gray-400 font-bold">Mèo nghe thấy:</p>
                 <p id="result-text" class="text-gray-600 italic min-h-[24px] text-sm bg-gray-50/50 p-2 rounded-xl border border-gray-100 mt-1">—</p>
@@ -195,33 +212,69 @@
             <div>
                 <p class="text-xs text-gray-400 font-bold flex justify-between">
                     <span>Điểm Meow-score:</span>
-                    <span id="score-text" class="text-sm font-black text-pink-500">0%</span>
+                    <span id="score-text" class="text-sm font-black dynamic-text-primary">0%</span>
                 </p>
-                <div class="w-full bg-pink-100 h-3.5 rounded-full overflow-hidden mt-1 p-0.5 border border-pink-200">
-                    <div id="score-bar" class="bg-gradient-to-r from-pink-400 to-rose-400 h-full w-0 rounded-full transition-all duration-500"></div>
+                <div class="w-full dynamic-bg-light h-3.5 rounded-full overflow-hidden mt-1 p-0.5 border dynamic-border-theme">
+                    <div id="score-bar" class="bg-gradient-to-r from-[var(--theme-btn-default)] to-rose-400 h-full w-0 rounded-full transition-all duration-500"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- ĐỊNH NGHĨA BỘ THEME MÀU PASTEL DỄ THƯƠNG ---
+        // --- ĐỊNH NGHĨA BỘ THEME MÀU PASTEL DỄ THƯƠNG + THÊM GIÁ TRỊ BIẾN CSS ---
         const themes = {
             pink: {
                 bgClass: 'bg-pink-100/60',
-                canvasColors: ['🐱', '🐾', '🐈', '😸', '😻', '😽', '🐟', '¼', '✨']
+                canvasColors: ['🐱', '🐾', '🐈', '😸', '😻', '😽', '🐟', '¼', '✨'],
+                // Khai báo bộ màu đồng bộ hệ Pink
+                colors: {
+                    '--theme-primary': '#ec4899',       // pink-500
+                    '--theme-primary-hover': '#be185d', // pink-700
+                    '--theme-light': '#fdf2f8',         // pink-50
+                    '--theme-border': '#fbcfe8',        // pink-200
+                    '--theme-btn-default': '#f472b6',   // pink-400
+                    '--theme-ring': '#fce7f3'           // pink-100
+                }
             },
             purple: {
                 bgClass: 'bg-purple-100/60',
-                canvasColors: ['🔮', '🐾', '🐈', '🪻', '🦄', '✨', '🪐', '🍬', '🎵']
+                canvasColors: ['🔮', '🐾', '🐈', '🪻', '🦄', '✨', '🪐', '🍬', '🎵'],
+                // Khai báo bộ màu đồng bộ hệ Purple
+                colors: {
+                    '--theme-primary': '#a855f7',       // purple-500
+                    '--theme-primary-hover': '#7e22ce', // purple-700
+                    '--theme-light': '#faf5ff',         // purple-50
+                    '--theme-border': '#e9d5ff',        // purple-200
+                    '--theme-btn-default': '#c084fc',   // purple-400
+                    '--theme-ring': '#f3e8ff'           // purple-100
+                }
             },
             green: {
                 bgClass: 'bg-emerald-100/60',
-                canvasColors: ['🌱', '🐾', '🍀', '🍏', '🦖', '✨', '🐢', '🍵', '🌲']
+                canvasColors: ['🌱', '🐾', '🍀', '🍏', '🦖', '✨', '🐢', '🍵', '🌲'],
+                // Khai báo bộ màu đồng bộ hệ Emerald/Green
+                colors: {
+                    '--theme-primary': '#10b981',       // emerald-500
+                    '--theme-primary-hover': '#047857', // emerald-700
+                    '--theme-light': '#ecfdf5',         // emerald-50
+                    '--theme-border': '#a7f3d0',        // emerald-200
+                    '--theme-btn-default': '#34d399',   // emerald-400
+                    '--theme-ring': '#d1fae5'           // emerald-100
+                }
             },
             yellow: {
                 bgClass: 'bg-amber-100/50',
-                canvasColors: ['🐥', '🐾', '🐱', '🍋', '🥞', '✨', '🧀', '🌟', '🍯']
+                canvasColors: ['🐥', '🐾', '🐱', '🍋', '🥞', '✨', '🧀', '🌟', '🍯'],
+                // Khai báo bộ màu đồng bộ hệ Amber/Yellow
+                colors: {
+                    '--theme-primary': '#f59e0b',       // amber-500
+                    '--theme-primary-hover': '#b45309', // amber-700
+                    '--theme-light': '#fff9db',         // màu vàng kem siêu nhạt tự chọn
+                    '--theme-border': '#fde68a',        // amber-200
+                    '--theme-btn-default': '#fbbf24',   // amber-400
+                    '--theme-ring': '#fef3c7'           // amber-100
+                }
             }
         };
 
@@ -235,9 +288,15 @@
         function changeTheme(themeName) {
             if (!themes[themeName]) return;
             
-            // Cập nhật class nền của body
+            // 1. Cập nhật class nền của body
             document.body.className = `${themes[themeName].bgClass} min-h-screen flex items-center justify-center p-4 relative overflow-hidden`;
             
+            // 2. CẬP NHẬT CÁC BIẾN CSS ĐỂ ĐỔI MÀU KHUNG VÀ CHỮ TOÀN DIỆN
+            const themeColors = themes[themeName].colors;
+            for (const key in themeColors) {
+                document.documentElement.style.setProperty(key, themeColors[key]);
+            }
+
             currentTheme = themeName;
             
             // Đổi nhanh icon rơi trên Canvas cho phù hợp theme
@@ -400,7 +459,6 @@
                 btnText.innerText = "BẤM HỌC";
                 btnRecord.style.backgroundColor = ""; 
                 btnRecord.classList.remove('animate-pulse', 'ring-rose-100');
-                btnRecord.classList.add('ring-pink-100');
             };
 
             recognition.onresult = (event) => {
