@@ -1,4 +1,645 @@
-origin: { x: randomInRange(0.6, 0.9), y: Math.random() - 0.2 } 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meow Pronunciation Coach 🐾</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght=500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Thiết lập các biến màu sắc cốt lõi mặc định (Theme Hồng) */
+        :root {
+            --theme-primary: #ec4899;      /* Hồng gốc (pink-500) */
+            --theme-primary-hover: #be185d;/* Hồng đậm (pink-700) */
+            --theme-light: #fdf2f8;        /* Hồng siêu nhạt (pink-50) */
+            --theme-border: #fbcfe8;       /* Hồng nhạt làm border (pink-200) */
+            --theme-btn-default: #f472b6;  /* Màu nút đầu mèo lúc bình thường (pink-400) */
+            --theme-ring: #fce7f3;         /* Màu vòng ring ngoài nút (pink-100) */
+        }
+
+        body { font-family: 'Comfortaa', cursive, sans-serif; transition: background-color 0.5s ease; }
+        .correct { color: #10B981; font-weight: bold; }
+        .incorrect { color: #EF4444; font-weight: bold; text-decoration: line-through; }
+        
+        /* Hiệu ứng tai mèo sử dụng biến màu border động để đồng bộ màu */
+        .cat-box::before {
+            content: "▲";
+            color: white;
+            text-shadow: 0 -4px 0 var(--theme-border);
+            font-size: 38px;
+            position: absolute;
+            top: -28px;
+            left: 40px;
+        }
+        .cat-box::after {
+            content: "▲";
+            color: white;
+            text-shadow: 0 -4px 0 var(--theme-border);
+            font-size: 38px;
+            position: absolute;
+            top: -28px;
+            right: 40px;
+        }
+
+        /* --- CSS TẠO HÌNH ĐẦU MÈO CHO NÚT BẤM --- */
+        .cat-head-btn {
+            position: relative;
+            width: 120px;
+            height: 100px;
+            background-color: var(--theme-btn-default); /* Đồng bộ màu theo biến */
+            border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Tai mèo bên trái và bên phải */
+        .cat-head-btn::before, .cat-head-btn::after {
+            content: "";
+            position: absolute;
+            top: -8px;
+            width: 32px;
+            height: 35px;
+            background-color: inherit;
+            border-radius: 30% 70% 30% 70% / 30% 70% 30% 70%;
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+        .cat-head-btn::before {
+            left: 6px;
+            transform: rotate(-35deg);
+        }
+        .cat-head-btn::after {
+            right: 6px;
+            transform: rotate(35deg);
+            border-radius: 70% 30% 70% 30% / 70% 30% 70% 30%;
+        }
+
+        /* Chi tiết mắt và râu bên trong mặt mèo */
+        .cat-eyes {
+            position: absolute;
+            top: 32px;
+            width: 76px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .cat-eyes::before, .cat-eyes::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+        }
+
+        .cat-whiskers-l, .cat-whiskers-r {
+            position: absolute;
+            top: 42px;
+            width: 20px;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+        }
+        .cat-whiskers-l { left: -10px; transform: rotate(10deg); box-shadow: 0 8px 0 rgba(255, 255, 255, 0.6); }
+        .cat-whiskers-r { right: -10px; transform: rotate(-10deg); box-shadow: 0 8px 0 rgba(255, 255, 255, 0.6); }
+
+        /* --- HIỆU ỨNG LẮC LƯ KHI PHÁT ÂM CHƯA CHUẨN --- */
+        @keyframes meow-shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px) rotate(-3deg); }
+            40%, 80% { transform: translateX(6px) rotate(3deg); }
+        }
+        .animate-shake {
+            animation: meow-shake 0.4s ease-in-out;
+        }
+
+        /* Lớp màu động ép buộc theo biến CSS */
+        .dynamic-text-primary { color: var(--theme-primary) !important; }
+        .dynamic-text-hover:hover { color: var(--theme-primary-hover) !important; }
+        .dynamic-bg-light { background-color: var(--theme-light) !important; }
+        .dynamic-border-theme { border-color: var(--theme-border) !important; }
+        .dynamic-ring-theme { --tw-ring-color: var(--theme-ring) !important; }
+    </style>
+</head>
+<body class="bg-pink-100/60 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    
+    <canvas id="cat-bg-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <div class="absolute top-4 right-4 z-30">
+        <button onclick="toggleThemeMenu()" class="bg-white/80 backdrop-blur-xs p-2 rounded-full shadow-md hover:scale-110 active:scale-95 transition-all text-gray-500 dynamic-text-hover cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-[spin_8s_linear_infinite]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        </button>
+        <div id="theme-menu" class="hidden absolute right-0 mt-2 bg-white/95 backdrop-blur-md p-3 rounded-2xl shadow-xl border dynamic-border-theme min-w-[160px] space-y-2">
+            <p class="text-[11px] font-bold text-gray-400 text-center mb-1">Màu nền Meow 🐾</p>
+            <button onclick="changeTheme('pink')" class="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-xl hover:bg-pink-50 text-pink-600 font-bold transition-colors cursor-pointer">
+                <span class="w-4 h-4 rounded-full bg-pink-300 border border-pink-400"></span> Hồng Sữa
+            </button>
+            <button onclick="changeTheme('purple')" class="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-xl hover:bg-purple-50 text-purple-600 font-bold transition-colors cursor-pointer">
+                <span class="w-4 h-4 rounded-full bg-purple-300 border border-purple-400"></span> Khoai Môn
+            </button>
+            <button onclick="changeTheme('green')" class="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-xl hover:bg-emerald-50 text-emerald-600 font-bold transition-colors cursor-pointer">
+                <span class="w-4 h-4 rounded-full bg-emerald-200 border border-emerald-300"></span> Bạc Hà
+            </button>
+            <button onclick="changeTheme('yellow')" class="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-xl hover:bg-amber-50 text-amber-600 font-bold transition-colors cursor-pointer">
+                <span class="w-4 h-4 rounded-full bg-amber-200 border border-amber-300"></span> Vàng Kem
+            </button>
+        </div>
+    </div>
+
+    <div class="cat-box bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border-4 dynamic-border-theme relative z-10 transition-all duration-500">
+        
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold dynamic-text-primary flex items-center gap-1.5">
+                <span>🐱</span> Meow Coach
+            </h1>
+            <span id="progress-text" class="text-xs dynamic-bg-light dynamic-text-primary px-3 py-1 rounded-full font-bold shadow-xs">Câu 1/9</span>
+        </div>
+        
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-1">
+                <p class="text-xs dynamic-text-primary opacity-80 font-bold flex items-center gap-1">🐾 Thử thách phát âm Mỹ:</p>
+                <button onclick="speakCurrentSentence()" class="text-xs dynamic-text-primary dynamic-text-hover font-bold flex items-center gap-0.5 transition-colors">
+                    🔊 Nghe mẫu
+                </button>
+            </div>
+            <div id="target-text" class="text-lg font-bold text-gray-700 dynamic-bg-light p-4 rounded-2xl border-2 border-dashed dynamic-border-theme min-h-[60px] flex items-center relative">
+                Loading...
+            </div>
+            <div class="flex justify-between items-center mt-2">
+                <span id="auto-next-status" class="text-xs text-emerald-500 font-bold animate-pulse hidden">✨ Meo! Xuất sắc >90%! Đổi câu...</span>
+                <button onclick="changeSentence()" class="text-xs dynamic-text-primary opacity-80 dynamic-text-hover font-bold ml-auto transition-colors">
+                    Next câu khác 🐾
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center gap-3 my-8">
+            <div class="relative pt-4"> 
+                <button id="btn-record" onclick="handleCatButtonClick()" class="cat-head-btn text-white focus:outline-none ring-8 dynamic-ring-theme hover:scale-105 transition-all">
+                    <div class="cat-eyes"></div>
+                    <div class="cat-whiskers-l"></div>
+                    <div class="cat-whiskers-r"></div>
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-4 mb-0.5 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    <span id="btn-text" class="text-[9px] font-black tracking-wider z-10 uppercase">BẤM HỌC</span>
+                </button>
+            </div>
+            <p id="status" class="text-xs dynamic-text-primary font-bold text-center mt-3 dynamic-bg-light/80 px-4 py-1 rounded-full">Nhấn đầu mèo, mèo sẽ đọc mẫu rồi sen đọc theo nhé!</p>
+        </div>
+
+        <div class="space-y-4 pt-4 border-t-2 border-dashed dynamic-border-theme">
+            <div>
+                <p class="text-xs text-gray-400 font-bold">Mèo nghe thấy:</p>
+                <p id="result-text" class="text-gray-600 italic min-h-[24px] text-sm bg-gray-50/50 p-2 rounded-xl border border-gray-100 mt-1">—</p>
+            </div>
+            
+            <div>
+                <p class="text-xs text-gray-400 font-bold">Mèo sửa lỗi:</p>
+                <div id="analysis-text" class="text-sm min-h-[24px] bg-gray-50/50 p-2 rounded-xl border border-gray-100 mt-1">—</div>
+            </div>
+
+            <div>
+                <p class="text-xs text-gray-400 font-bold flex justify-between">
+                    <span>Điểm Meow-score:</span>
+                    <span id="score-text" class="text-sm font-black dynamic-text-primary">0%</span>
+                </p>
+                <div class="w-full dynamic-bg-light h-3.5 rounded-full overflow-hidden mt-1 p-0.5 border dynamic-border-theme">
+                    <div id="score-bar" class="bg-gradient-to-r from-[var(--theme-btn-default)] to-rose-400 h-full w-0 rounded-full transition-all duration-500"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- ĐỊNH NGHĨA BỘ THEME MÀU PASTEL DỄ THƯƠNG + THÊM GIÁ TRỊ BIẾN CSS ---
+        const themes = {
+            pink: {
+                bgClass: 'bg-pink-100/60',
+                canvasColors: ['🐱', '🐾', '🐈', '😸', '😻', '😽', '🐟', '¼', '✨'],
+                // Khai báo bộ màu đồng bộ hệ Pink
+                colors: {
+                    '--theme-primary': '#ec4899',       // pink-500
+                    '--theme-primary-hover': '#be185d', // pink-700
+                    '--theme-light': '#fdf2f8',         // pink-50
+                    '--theme-border': '#fbcfe8',        // pink-200
+                    '--theme-btn-default': '#f472b6',   // pink-400
+                    '--theme-ring': '#fce7f3'           // pink-100
+                }
+            },
+            purple: {
+                bgClass: 'bg-purple-100/60',
+                canvasColors: ['🔮', '🐾', '🐈', '🪻', '🦄', '✨', '🪐', '🍬', '🎵'],
+                // Khai báo bộ màu đồng bộ hệ Purple
+                colors: {
+                    '--theme-primary': '#a855f7',       // purple-500
+                    '--theme-primary-hover': '#7e22ce', // purple-700
+                    '--theme-light': '#faf5ff',         // purple-50
+                    '--theme-border': '#e9d5ff',        // purple-200
+                    '--theme-btn-default': '#c084fc',   // purple-400
+                    '--theme-ring': '#f3e8ff'           // purple-100
+                }
+            },
+            green: {
+                bgClass: 'bg-emerald-100/60',
+                canvasColors: ['🌱', '🐾', '🍀', '🍏', '🦖', '✨', '🐢', '🍵', '🌲'],
+                // Khai báo bộ màu đồng bộ hệ Emerald/Green
+                colors: {
+                    '--theme-primary': '#10b981',       // emerald-500
+                    '--theme-primary-hover': '#047857', // emerald-700
+                    '--theme-light': '#ecfdf5',         // emerald-50
+                    '--theme-border': '#a7f3d0',        // emerald-200
+                    '--theme-btn-default': '#34d399',   // emerald-400
+                    '--theme-ring': '#d1fae5'           // emerald-100
+                }
+            },
+            yellow: {
+                bgClass: 'bg-amber-100/50',
+                canvasColors: ['🐥', '🐾', '🐱', '🍋', '🥞', '✨', '🧀', '🌟', '🍯'],
+                // Khai báo bộ màu đồng bộ hệ Amber/Yellow
+                colors: {
+                    '--theme-primary': '#f59e0b',       // amber-500
+                    '--theme-primary-hover': '#b45309', // amber-700
+                    '--theme-light': '#fff9db',         // màu vàng kem siêu nhạt tự chọn
+                    '--theme-border': '#fde68a',        // amber-200
+                    '--theme-btn-default': '#fbbf24',   // amber-400
+                    '--theme-ring': '#fef3c7'           // amber-100
+                }
+            }
+        };
+
+        let currentTheme = 'pink';
+
+        function toggleThemeMenu() {
+            const menu = document.getElementById('theme-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function changeTheme(themeName) {
+            if (!themes[themeName]) return;
+            
+            // 1. Cập nhật class nền của body
+            document.body.className = `${themes[themeName].bgClass} min-h-screen flex items-center justify-center p-4 relative overflow-hidden`;
+            
+            // 2. CẬP NHẬT CÁC BIẾN CSS ĐỂ ĐỔI MÀU KHUNG VÀ CHỮ TOÀN DIỆN
+            const themeColors = themes[themeName].colors;
+            for (const key in themeColors) {
+                document.documentElement.style.setProperty(key, themeColors[key]);
+            }
+
+            currentTheme = themeName;
+            
+            // Đổi nhanh icon rơi trên Canvas cho phù hợp theme
+            particles.forEach(p => {
+                p.icon = themes[themeName].canvasColors[Math.floor(Math.random() * themes[themeName].canvasColors.length)];
+            });
+
+            // Ẩn menu sau khi chọn
+            document.getElementById('theme-menu').classList.add('hidden');
+        }
+
+        // Đóng menu khi bấm ra ngoài vùng cài đặt
+        window.addEventListener('click', function(e) {
+            const menu = document.getElementById('theme-menu');
+            const configBtn = menu.previousElementSibling;
+            if (!menu.contains(e.target) && !configBtn.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+
+        // --- SCRIPT HOẠT HỌA ICON MÈO MINI TRÊN BACKGROUND ---
+        const canvas = document.getElementById('cat-bg-canvas');
+        const ctxBg = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        const particles = [];
+        const particleCount = 45;
+
+        class CatParticle {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * height; 
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = -30;
+                const pool = themes[currentTheme].canvasColors;
+                this.icon = pool[Math.floor(Math.random() * pool.length)];
+                this.size = Math.random() * 14 + 14;
+                this.speedY = Math.random() * 0.6 + 0.4;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.opacity = Math.random() * 0.25 + 0.15;
+                this.angle = Math.random() * Math.PI * 2;
+                this.spin = Math.random() * 0.01 - 0.005;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.spin;
+
+                if (this.y > height + 30 || this.x < -30 || this.x > width + 30) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctxBg.save();
+                ctxBg.globalAlpha = this.opacity;
+                ctxBg.font = `${this.size}px Comfortaa, Arial`;
+                ctxBg.translate(this.x, this.y);
+                ctxBg.rotate(this.angle);
+                ctxBg.textAlign = 'center';
+                ctxBg.textBaseline = 'middle';
+                ctxBg.fillText(this.icon, 0, 0);
+                ctxBg.restore();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new CatParticle());
+        }
+
+        function animateBackground() {
+            ctxBg.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateBackground);
+        }
+        animateBackground();
+
+
+        // --- LOGIC MEOW APP CHÍNH ---
+        const sentences = [
+            "How is the weather today?",
+            "I would like to order a cup of coffee.",
+            "Practice makes perfect.",
+            "This summer I will visit new country.",
+            "Can you tell me how to get to the station?",
+            "A cat is very beautiful",
+            "The sky is blue",
+            "Try your best",
+            "I have breakfast every morning"
+        ];
+
+        let currentSentenceIndex = 0;
+        let autoNextTimeout = null; 
+
+        const targetTextElem = document.getElementById('target-text');
+        const progressTextElem = document.getElementById('progress-text');
+        const autoNextStatusElem = document.getElementById('auto-next-status');
+        const btnRecord = document.getElementById('btn-record');
+        const btnText = document.getElementById('btn-text');
+        const statusElem = document.getElementById('status');
+        const resultTextElem = document.getElementById('result-text');
+        const analysisElem = document.getElementById('analysis-text');
+        const scoreBar = document.getElementById('score-bar');
+        const scoreText = document.getElementById('score-text');
+
+        targetTextElem.innerText = sentences[currentSentenceIndex];
+        progressTextElem.innerText = `Câu 1/${sentences.length}`;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        let isListening = false;
+        let isSpeakingSample = false; 
+
+        function clearButtonEffects() {
+            btnRecord.classList.remove(
+                'shadow-[0_0_25px_rgba(244,31,95,0.85)]', 
+                'ring-rose-500', 
+                'animate-shake'
+            );
+        }
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false; 
+            recognition.lang = 'en-US'; 
+            recognition.interimResults = false; 
+
+            recognition.onstart = () => {
+                isListening = true;
+                if(autoNextTimeout) clearTimeout(autoNextTimeout);
+                autoNextStatusElem.classList.add('hidden');
+                
+                clearButtonEffects();
+
+                statusElem.innerText = "Mèo đang lắng nghe... Nói đi sen ơi! 🐱";
+                btnText.innerText = "ĐANG NGHE";
+                btnRecord.style.backgroundColor = "#f43f5e"; 
+                btnRecord.classList.remove('ring-pink-100');
+                btnRecord.classList.add('animate-pulse', 'ring-rose-100');
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                statusElem.innerText = "Mèo đang chấm điểm nha...";
+                btnText.innerText = "BẤM HỌC";
+                btnRecord.style.backgroundColor = ""; 
+                btnRecord.classList.remove('animate-pulse', 'ring-rose-100');
+            };
+
+            recognition.onresult = (event) => {
+                const speechToText = event.results[0][0].transcript;
+                resultTextElem.innerText = speechToText;
+                evaluatePronunciation(targetTextElem.innerText, speechToText);
+            };
+
+            recognition.onerror = (event) => {
+                statusElem.innerText = "Hic, không nghe rõ! Thử lại nha sen? (🐾)";
+            };
+        } else {
+            alert("Trình duyệt không hỗ trợ Web Speech API. Hãy mở bằng Google Chrome nhé!");
+        }
+
+        function speakCurrentSentence(callback) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                
+                const utterance = new SpeechSynthesisUtterance(targetTextElem.innerText);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; 
+
+                utterance.onstart = () => {
+                    isSpeakingSample = true;
+                    clearButtonEffects();
+                    statusElem.innerText = "Mèo đang đọc mẫu tiếng Mỹ... Hãy lắng nghe 🔊";
+                    btnText.innerText = "MÈO ĐANG ĐỌC";
+                    btnRecord.style.backgroundColor = "#a855f7"; 
+                    btnRecord.classList.add('animate-bounce'); 
+                };
+
+                utterance.onend = () => {
+                    isSpeakingSample = false;
+                    btnRecord.classList.remove('animate-bounce');
+                    btnRecord.style.backgroundColor = "";
+                    btnText.innerText = "BẤM HỌC";
+                    if (callback) callback(); 
+                };
+
+                utterance.onerror = () => {
+                    isSpeakingSample = false;
+                    btnRecord.classList.remove('animate-bounce');
+                    btnRecord.style.backgroundColor = "";
+                    btnText.innerText = "BẤM HỌC";
+                    if (callback) callback();
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                if (callback) callback();
+            }
+        }
+
+        function handleCatButtonClick() {
+            if (!recognition) return;
+
+            if (isListening) {
+                recognition.stop();
+                return;
+            }
+
+            if (isSpeakingSample) return;
+
+            speakCurrentSentence(() => {
+                recognition.start();
+            });
+        }
+
+        function changeSentence() {
+            if(autoNextTimeout) clearTimeout(autoNextTimeout);
+            autoNextStatusElem.classList.add('hidden');
+            if(window.speechSynthesis) window.speechSynthesis.cancel();
+            
+            clearButtonEffects();
+
+            currentSentenceIndex = (currentSentenceIndex + 1) % sentences.length;
+            
+            targetTextElem.innerText = sentences[currentSentenceIndex].trim();
+            progressTextElem.innerText = `Câu ${currentSentenceIndex + 1}/${sentences.length}`;
+            
+            resultTextElem.innerText = "—";
+            analysisElem.innerHTML = "—";
+            scoreBar.style.width = "0%";
+            scoreText.innerText = "0%";
+            statusElem.innerText = "Nhấn đầu mèo, mèo sẽ đọc mẫu rồi sen đọc theo nhé!";
+        }
+
+        function cleanWord(word) {
+            return word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+        }
+
+        function playMeowSound(type = 'meow') {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                
+                const ctx = new AudioContext();
+                const now = ctx.currentTime;
+
+                if (type === 'meow') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    
+                    osc.frequency.setValueAtTime(380, now);
+                    osc.frequency.exponentialRampToValueAtTime(720, now + 0.12);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.45);
+                    
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.2, now + 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                    
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                    
+                } else {
+                    const osc = ctx.createOscillator();
+                    const modulator = ctx.createOscillator();
+                    const modGain = ctx.createGain();
+                    const mainGain = ctx.createGain();
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(75, now); 
+                    
+                    modulator.type = 'sine';
+                    modulator.frequency.setValueAtTime(28, now); 
+                    modGain.gain.setValueAtTime(25, now); 
+                    
+                    mainGain.gain.setValueAtTime(0, now);
+                    mainGain.gain.linearRampToValueAtTime(0.25, now + 0.1);
+                    mainGain.gain.setValueAtTime(0.25, now + 0.7);
+                    mainGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+                    
+                    const filter = ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(140, now);
+                    
+                    modulator.connect(modGain);
+                    modGain.connect(osc.frequency);
+                    osc.connect(filter);
+                    filter.connect(mainGain);
+                    mainGain.connect(ctx.destination);
+                    
+                    modulator.start(now);
+                    osc.start(now);
+                    modulator.stop(now + 0.9);
+                    osc.stop(now + 0.9);
+                }
+            } catch (e) {
+                console.log("AudioContext gặp lỗi:", e);
+            }
+        }
+
+        function triggerFireworks() {
+            const duration = 1.5 * 1000; 
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 25, spread: 360, ticks: 60, zIndex: 99, colors: ['#ffb7b2', '#ffdac1', '#e2f0cb', '#b5ead7', '#ffffff'] };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 40 * (timeLeft / duration);
+                
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.1, 0.4), y: Math.random() - 0.2 } 
+                }));
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.6, 0.9), y: Math.random() - 0.2 } 
                 }));
             }, 250);
         }
