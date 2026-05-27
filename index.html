@@ -100,12 +100,9 @@
         .cat-whiskers-r { right: -10px; transform: rotate(-10deg); box-shadow: 0 8px 0 rgba(255, 255, 255, 0.6); }
     </style>
 </head>
-<body class="bg-pink-100/60 min-h-screen flex items-center justify-center p-4 relative overflow-x-hidden">
+<body class="bg-pink-100/60 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
     
-    <div class="absolute text-pink-200 text-4xl top-10 left-10 select-none animate-bounce">🐾</div>
-    <div class="absolute text-pink-200 text-4xl bottom-10 right-10 select-none animate-bounce" style="animation-delay: 1s;">🐱</div>
-    <div class="absolute text-pink-200 text-3xl top-1/2 right-8 select-none opacity-50">✨</div>
-    <div class="absolute text-pink-200 text-3xl bottom-1/3 left-8 select-none opacity-50">✨</div>
+    <canvas id="cat-bg-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
 
     <div class="cat-box bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border-4 border-pink-200 relative z-10">
         
@@ -169,6 +166,84 @@
     </div>
 
     <script>
+        // --- SCRIPT HOẠT HỌA ICON MÈO MINI TRÊN BACKGROUND ---
+        const canvas = document.getElementById('cat-bg-canvas');
+        const ctxBg = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        // Danh sách các icon mini siêu đáng yêu liên quan đến mèo
+        const catIcons = ['🐱', '🐾', '🐈', '😸', '😻', '😽', '🐟', '🧶', '✨'];
+        const particles = [];
+        const particleCount = 45; // Bạn có thể tăng/giảm số lượng icon ở đây
+
+        class CatParticle {
+            constructor() {
+                this.reset();
+                // Cho các icon rải rác ngẫu nhiên trên màn hình ở lần đầu tải trang
+                this.y = Math.random() * height; 
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = -30; // Chạy từ phía trên đỉnh màn hình xuống
+                this.icon = catIcons[Math.floor(Math.random() * catIcons.length)];
+                this.size = Math.random() * 14 + 14; // Kích thước mini từ 14px đến 28px
+                this.speedY = Math.random() * 0.6 + 0.4; // Tốc độ rơi nhẹ nhàng
+                this.speedX = Math.random() * 0.4 - 0.2; // Độ đung đưa trái phải
+                this.opacity = Math.random() * 0.25 + 0.15; // Độ mờ sương (để không làm rối mắt app chính)
+                this.angle = Math.random() * Math.PI * 2;
+                this.spin = Math.random() * 0.01 - 0.005; // Độ xoay nhẹ tửng icon
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.angle += this.spin;
+
+                // Nếu chạy hết cuối màn hình thì reset lên lại đỉnh đầu
+                if (this.y > height + 30 || this.x < -30 || this.x > width + 30) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctxBg.save();
+                ctxBg.globalAlpha = this.opacity;
+                ctxBg.font = `${this.size}px Comfortaa, Arial`;
+                ctxBg.translate(this.x, this.y);
+                ctxBg.rotate(this.angle);
+                ctxBg.textAlign = 'center';
+                ctxBg.textBaseline = 'middle';
+                ctxBg.fillText(this.icon, 0, 0);
+                ctxBg.restore();
+            }
+        }
+
+        // Khởi tạo cụm icon ban đầu
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new CatParticle());
+        }
+
+        // Vòng lặp chạy hoạt ảnh mượt mà 60fps
+        function animateBackground() {
+            ctxBg.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateBackground);
+        }
+        animateBackground();
+
+
+        // --- LOGIC MEOW APP CHÍNH CỦA BẠN (GIỮ NGUYÊN) ---
         const sentences = [
             "How is the weather today?",
             "I would like to order a cup of coffee.",
@@ -179,7 +254,6 @@
             "The sky is blue",
             " Try your best",
             " I have breakfast every morning"
-    
         ];
 
         let currentSentenceIndex = 0;
@@ -214,7 +288,7 @@
                 autoNextStatusElem.classList.add('hidden');
 
                 statusElem.innerText = "Mèo đang lắng nghe... Ngấu meo! 🐱";
-                btnRecord.style.backgroundColor = "#f43f5e"; /* Đổi sang màu rose-500 bằng JS */
+                btnRecord.style.backgroundColor = "#f43f5e"; 
                 btnRecord.classList.remove('ring-pink-100');
                 btnRecord.classList.add('animate-pulse', 'ring-rose-100');
             };
@@ -222,7 +296,7 @@
             recognition.onend = () => {
                 isListening = false;
                 statusElem.innerText = "Mèo đang chấm điểm nha...";
-                btnRecord.style.backgroundColor = ""; /* Trở về mặc định màu hồng cũ */
+                btnRecord.style.backgroundColor = ""; 
                 btnRecord.classList.remove('animate-pulse', 'ring-rose-100');
                 btnRecord.classList.add('ring-pink-100');
             };
@@ -269,7 +343,6 @@
             return word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
         }
 
-        // HÀM PHÁT ÂM THANH MÈO: MEOW (KHI ĐẠT >90%) HOẶC GỪ RỪ RỪ (KHI <90%)
         function playMeowSound(type = 'meow') {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -279,7 +352,6 @@
                 const now = ctx.currentTime;
 
                 if (type === 'meow') {
-                    // --- TIẾNG MÈO KÊU MEOW CHÚC MỪNG ---
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.type = 'triangle';
@@ -298,18 +370,16 @@
                     osc.stop(now + 0.45);
                     
                 } else {
-                    // --- TIẾNG MÈO GỪ RỪ RỪ (PURR) AN ỦI ---
-                    // Sử dụng bộ tạo dao động tần số rất thấp kết hợp điều chế biên độ liên tục
                     const osc = ctx.createOscillator();
                     const modulator = ctx.createOscillator();
                     const modGain = ctx.createGain();
                     const mainGain = ctx.createGain();
                     
                     osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(75, now); // Tần số gừ thấp trầm ấm
+                    osc.frequency.setValueAtTime(75, now); 
                     
                     modulator.type = 'sine';
-                    modulator.frequency.setValueAtTime(28, now); // Nhịp rung gừ rừ rừ
+                    modulator.frequency.setValueAtTime(28, now); 
                     modGain.gain.setValueAtTime(25, now); 
                     
                     mainGain.gain.setValueAtTime(0, now);
@@ -317,7 +387,6 @@
                     mainGain.gain.setValueAtTime(0.25, now + 0.7);
                     mainGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
                     
-                    // Tạo bộ lọc tần số thấp để tiếng gừ mềm, không bị chói tai
                     const filter = ctx.createBiquadFilter();
                     filter.type = 'lowpass';
                     filter.frequency.setValueAtTime(140, now);
@@ -397,7 +466,6 @@
                 statusElem.innerText = "Meo meo! Đỉnh quá sen ơi! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
                 
-                // Phát tiếng Meow dễ thương và bắn pháo hoa
                 playMeowSound('meow');
                 triggerFireworks();
                 
@@ -406,7 +474,6 @@
                 }, 2500);
             } else {
                 statusElem.innerText = "Hụt mất rồi! Mèo đang gừ giận/an ủi đó nha~";
-                // Phát tiếng mèo gừ trầm (purr) khi điểm thấp
                 playMeowSound('purr');
             }
         }
