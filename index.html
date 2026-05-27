@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI English Pronunciation Checker</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .correct { color: #10B981; font-weight: bold; }
+        .incorrect { color: #EF4444; font-weight: bold; text-decoration: line-through; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-gray-100">
+        <h1 class="text-2xl font-bold text-center text-indigo-600 mb-6">🇺🇸 Pronunciation Coach</h1>
+        
+        <div class="mb-6">
+            <p class="text-sm text-gray-500 font-medium mb-1">Câu mẫu (Chuẩn American English):</p>
+            <div id="target-text" class="text-lg font-semibold text-gray-800 bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                How is the weather today?
+            </div>
+            <button onclick="changeSentence()" class="text-xs text-indigo-500 hover:text-indigo-700 mt-2 block ml-auto font-medium">
+                🔄 Đổi câu khác
+            </button>
+        </div>
+
+        <div class="flex flex-col items-center justify-center gap-4 my-8">
+            <button id="btn-record" onclick="toggleListening()" class="w-20 h-20 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-700 transition-all focus:outline-none ring-4 ring-indigo-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+            </button>
+            <p id="status" class="text-sm text-gray-500 italic">Nhấn nút và bắt đầu nói...</p>
+        </div>
+
+        <div class="space-y-4 pt-4 border-t border-gray-100">
+            <div>
+                <p class="text-sm text-gray-500 font-medium">Bạn đã nói:</p>
+                <p id="result-text" class="text-gray-700 italic min-h-[24px]">—</p>
+            </div>
+            
+            <div>
+                <p class="text-sm text-gray-500 font-medium">Phân tích chi tiết:</p>
+                <div id="analysis-text" class="text-gray-700 min-h-[24px]">—</div>
+            </div>
+
+            <div>
+                <p class="text-sm text-gray-500 font-medium">Điểm số:</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                        <div id="score-bar" class="bg-emerald-500 h-full w-0 transition-all duration-500"></div>
+                    </div>
+                    <span id="score-text" class="text-lg font-bold text-emerald-600">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Danh sách các câu mẫu tiếng Anh Mỹ thông dụng
+        const sentences = [
+            "How is the weather today?",
+            "I would like to order a cup of coffee.",
+            "Practice makes perfect.",
+            "Google Speech API is totally free and powerful.",
+            "Water under the bridge.",
+            "Can you tell me how to get to the train station?"
+        ];
+
+        let currentSentenceIndex = 0;
+        const targetTextElem = document.getElementById('target-text');
+        const btnRecord = document.getElementById('btn-record');
+        const statusElem = document.getElementById('status');
+        const resultTextElem = document.getElementById('result-text');
+        const analysisElem = document.getElementById('analysis-text');
+        const scoreBar = document.getElementById('score-bar');
+        const scoreText = document.getElementById('score-text');
+
+        // Kiểm tra trình duyệt hỗ trợ SpeechRecognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        let isListening = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false; // Dừng lại khi người dùng ngừng nói
+            recognition.lang = 'en-US'; // Cấu hình nhận diện chuẩn ANH - MỸ
+            recognition.interimResults = false; // Chỉ lấy kết quả cuối cùng
+
+            recognition.onstart = () => {
+                isListening = true;
+                statusElem.innerText = "Listening... Đang nghe bạn nói (Chuẩn en-US)";
+                btnRecord.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                btnRecord.classList.add('bg-red-500', 'hover:bg-red-600', 'animate-pulse');
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                statusElem.innerText = "Đã nhận diện xong. Đang chấm điểm...";
+                btnRecord.classList.remove('bg-red-500', 'hover:bg-red-600', 'animate-pulse');
+                btnRecord.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            };
+
+            recognition.onresult = (event) => {
+                const speechToText = event.results[0][0].transcript;
+                resultTextElem.innerText = speechToText;
+                evaluatePronunciation(targetTextElem.innerText, speechToText);
+            };
+
+            recognition.onerror = (event) => {
+                statusElem.innerText = "Lỗi nhận diện: " + event.error;
+            };
+        } else {
+            alert("Trình duyệt của bạn không hỗ trợ Web Speech API. Hãy dùng Google Chrome!");
+        }
+
+        function toggleListening() {
+            if (!recognition) return;
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        function changeSentence() {
+            currentSentenceIndex = (currentSentenceIndex + 1) % sentences.length;
+            targetTextElem.innerText = sentences[currentSentenceIndex];
+            // Reset kết quả cũ
+            resultTextElem.innerText = "—";
+            analysisElem.innerHTML = "—";
+            scoreBar.style.width = "0%";
+            scoreText.innerText = "0%";
+            statusElem.innerText = "Nhấn nút và bắt đầu nói...";
+        }
+
+        // Hàm chuẩn hóa chuỗi (bỏ dấu câu, viết thường)
+        function cleanWord(word) {
+            return word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+        }
+
+        // Thuật toán chấm điểm và so sánh từng từ
+        function evaluatePronunciation(target, spoken) {
+            const targetWords = target.split(" ");
+            const spokenWords = spoken.split(" ");
+            
+            let htmlAnalysis = [];
+            let correctCount = 0;
+
+            targetWords.forEach((tWord) => {
+                const cleanedT = cleanWord(tWord);
+                // Tìm xem từ này có xuất hiện trong câu người dùng nói không
+                const matchIndex = spokenWords.findIndex(sWord => cleanWord(sWord) === cleanedT);
+
+                if (matchIndex !== -1) {
+                    // Nếu đúng, tô màu xanh và xóa khỏi mảng spokenWords để tránh trùng lặp
+                    htmlAnalysis.push(`<span class="correct">${tWord}</span>`);
+                    spokenWords.splice(matchIndex, 1);
+                    correctCount++;
+                } else {
+                    // Nếu sai hoặc thiếu, tô màu đỏ
+                    htmlAnalysis.push(`<span class="incorrect">${tWord}</span>`);
+                }
+            });
+
+            // Tính điểm phần trăm
+            const scorePercentage = Math.round((correctCount / targetWords.length) * 100);
+
+            // Cập nhật giao diện
+            analysisElem.innerHTML = htmlAnalysis.join(" ");
+            scoreBar.style.width = `${scorePercentage}%`;
+            scoreText.innerText = `${scorePercentage}%`;
+            statusElem.innerText = scorePercentage > 70 ? "Good job! Phát âm rất tốt." : "Cố gắng lên, hãy thử lại nhé!";
+        }
+    </script>
+</body>
+</html>
