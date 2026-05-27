@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI English Pronunciation Checker (Pro)</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         .correct { color: #10B981; font-weight: bold; }
         .incorrect { color: #EF4444; font-weight: bold; text-decoration: line-through; }
@@ -12,10 +13,10 @@
 </head>
 <body class="bg-gray-50 font-sans min-h-screen flex items-center justify-center p-4">
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-gray-100">
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-gray-100 relative z-10">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-xl font-bold text-indigo-600">🇺🇸 Pronunciation Coach</h1>
-            <span id="progress-text" class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full font-semibold">Câu 1/5</span>
+            <span id="progress-text" class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full font-semibold">Câu 1/7</span>
         </div>
         
         <div class="mb-6">
@@ -64,20 +65,19 @@
     </div>
 
     <script>
-        // Bộ câu hỏi rút gọn cố định gồm đúng 5 câu phát âm Mỹ phổ biến
+        // Bộ câu hỏi gồm 7 câu phát âm Mỹ phổ biến của bạn
         const sentences = [
             "How is the weather today?",
             "I would like to order a cup of coffee.",
             "Practice makes perfect.",
             "Google Speech API is powerful.",
             "Can you tell me how to get to the station?",
-            " A cat is very beautiful",
-            " The sky is blue"
-            
+            "A cat is very beautiful",
+            "The sky is blue"
         ];
 
         let currentSentenceIndex = 0;
-        let autoNextTimeout = null; // Quản lý thời gian chờ chuyển câu hỏi
+        let autoNextTimeout = null; 
 
         const targetTextElem = document.getElementById('target-text');
         const progressTextElem = document.getElementById('progress-text');
@@ -89,10 +89,10 @@
         const scoreBar = document.getElementById('score-bar');
         const scoreText = document.getElementById('score-text');
 
-        // Khởi tạo câu đầu tiên khi tải trang
+        // Khởi tạo câu đầu tiên và cập nhật số lượng câu dựa trên mảng thực tế
         targetTextElem.innerText = sentences[currentSentenceIndex];
+        progressTextElem.innerText = `Câu 1/${sentences.length}`;
 
-        // Thiết lập cấu hình SpeechRecognition của Google
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         let isListening = false;
@@ -105,7 +105,6 @@
 
             recognition.onstart = () => {
                 isListening = true;
-                // Nếu người dùng bấm nói lại khi đang chờ chuyển câu, hủy bỏ lệnh chuyển câu tự động trước đó
                 if(autoNextTimeout) clearTimeout(autoNextTimeout);
                 autoNextStatusElem.classList.add('hidden');
 
@@ -143,19 +142,15 @@
             }
         }
 
-        // Hàm chuyển câu (bằng tay hoặc tự động)
         function changeSentence() {
             if(autoNextTimeout) clearTimeout(autoNextTimeout);
             autoNextStatusElem.classList.add('hidden');
 
-            // Tăng chỉ số câu hỏi, nếu vượt quá câu thứ 5 (Index 4) thì quay lại câu 1
             currentSentenceIndex = (currentSentenceIndex + 1) % sentences.length;
             
-            // Cập nhật giao diện câu hỏi mới
-            targetTextElem.innerText = sentences[currentSentenceIndex];
+            targetTextElem.innerText = sentences[currentSentenceIndex].trim();
             progressTextElem.innerText = `Câu ${currentSentenceIndex + 1}/${sentences.length}`;
             
-            // Reset toàn bộ thông số hiển thị cũ
             resultTextElem.innerText = "—";
             analysisElem.innerHTML = "—";
             scoreBar.style.width = "0%";
@@ -167,9 +162,42 @@
             return word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
         }
 
+        // Hàm kích hoạt hiệu ứng pháo hoa nhiều màu bung tỏa từ 2 góc màn hình
+        function triggerFireworks() {
+            const duration = 1.5 * 1000; // Pháo hoa bắn trong 1.5 giây
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                
+                // Bắn từ bên trái màn hình sang phải
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+                }));
+                // Bắn từ bên phải màn hình sang trái
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+                }));
+            }, 250);
+        }
+
         function evaluatePronunciation(target, spoken) {
-            const targetWords = target.split(" ");
-            const spokenWords = spoken.split(" ");
+            // Loại bỏ khoảng trắng thừa ở đầu/cuối của câu mẫu trước khi chia từ
+            const targetWords = target.trim().split(/\s+/);
+            const spokenWords = spoken.trim().split(/\s+/);
             
             let htmlAnalysis = [];
             let correctCount = 0;
@@ -189,20 +217,21 @@
 
             const scorePercentage = Math.round((correctCount / targetWords.length) * 100);
 
-            // Cập nhật giao diện điểm
             analysisElem.innerHTML = htmlAnalysis.join(" ");
             scoreBar.style.width = `${scorePercentage}%`;
             scoreText.innerText = `${scorePercentage}%`;
 
-            // XỬ LÝ LOGIC CẢI TIẾN: Nếu điểm số > 90%
             if (scorePercentage > 90) {
                 statusElem.innerText = "Tuyệt vời! Phát âm chuẩn xác.";
                 autoNextStatusElem.classList.remove('hidden');
                 
-                // Chờ 1.5 giây (1500ms) để người dùng xem kết quả rồi tự động đổi câu khác
+                // KÍCH HOẠT HIỆU ỨNG PHÁO HOA
+                triggerFireworks();
+                
+                // Tăng thời gian chờ lên 2.5 giây (2500ms) giúp người dùng thưởng thức pháo hoa trước khi đổi câu
                 autoNextTimeout = setTimeout(() => {
                     changeSentence();
-                }, 1500);
+                }, 2500);
             } else {
                 statusElem.innerText = "Chưa đạt chuẩn (>90%). Hãy thử lại câu này nhé!";
             }
