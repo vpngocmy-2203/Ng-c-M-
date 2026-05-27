@@ -98,6 +98,16 @@
         }
         .cat-whiskers-l { left: -10px; transform: rotate(10deg); box-shadow: 0 8px 0 rgba(255, 255, 255, 0.6); }
         .cat-whiskers-r { right: -10px; transform: rotate(-10deg); box-shadow: 0 8px 0 rgba(255, 255, 255, 0.6); }
+
+        /* --- HIỆU ỨNG LẮC LƯ KHI PHÁT ÂM CHƯA CHUẨN --- */
+        @keyframes meow-shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px) rotate(-3deg); }
+            40%, 80% { transform: translateX(6px) rotate(3deg); }
+        }
+        .animate-shake {
+            animation: meow-shake 0.4s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-pink-100/60 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
@@ -276,7 +286,16 @@
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         let isListening = false;
-        let isSpeakingSample = false; // Trạng thái kiểm tra xem Mèo có đang đọc mẫu không
+        let isSpeakingSample = false; 
+
+        // Hàm xóa toàn bộ hiệu ứng cũ trên nút mặt mèo trước lượt bấm/câu mới
+        function clearButtonEffects() {
+            btnRecord.classList.remove(
+                'shadow-[0_0_25px_rgba(244,31,95,0.85)]', 
+                'ring-rose-500', 
+                'animate-shake'
+            );
+        }
 
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
@@ -288,10 +307,13 @@
                 isListening = true;
                 if(autoNextTimeout) clearTimeout(autoNextTimeout);
                 autoNextStatusElem.classList.add('hidden');
+                
+                // Xóa hiệu ứng cũ khi bắt đầu ghi âm mới
+                clearButtonEffects();
 
                 statusElem.innerText = "Mèo đang lắng nghe... Nói đi sen ơi! 🐱";
                 btnText.innerText = "ĐANG NGHE";
-                btnRecord.style.backgroundColor = "#f43f5e"; // Đổi sang màu hồng đậm khi nghe
+                btnRecord.style.backgroundColor = "#f43f5e"; 
                 btnRecord.classList.remove('ring-pink-100');
                 btnRecord.classList.add('animate-pulse', 'ring-rose-100');
             };
@@ -318,21 +340,21 @@
             alert("Trình duyệt không hỗ trợ Web Speech API. Hãy mở bằng Google Chrome nhé!");
         }
 
-        // Hàm giúp mèo đọc mẫu tiếng Anh câu hiện tại
         function speakCurrentSentence(callback) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Tắt giọng đọc cũ nếu có
+                window.speechSynthesis.cancel(); 
                 
                 const utterance = new SpeechSynthesisUtterance(targetTextElem.innerText);
                 utterance.lang = 'en-US';
-                utterance.rate = 0.85; // Đọc hơi chậm một xíu cho chuẩn học tập
+                utterance.rate = 0.85; 
 
                 utterance.onstart = () => {
                     isSpeakingSample = true;
+                    clearButtonEffects(); // Xóa hiệu ứng cũ trước khi đọc mẫu
                     statusElem.innerText = "Mèo đang đọc mẫu tiếng Mỹ... Hãy lắng nghe 🔊";
                     btnText.innerText = "MÈO ĐANG ĐỌC";
-                    btnRecord.style.backgroundColor = "#a855f7"; // Đổi nút sang màu tím khi mèo đang đọc mẫu
-                    btnRecord.classList.add('animate-bounce'); // Hiệu ứng nhún nhảy vui nhộn
+                    btnRecord.style.backgroundColor = "#a855f7"; 
+                    btnRecord.classList.add('animate-bounce'); 
                 };
 
                 utterance.onend = () => {
@@ -340,7 +362,7 @@
                     btnRecord.classList.remove('animate-bounce');
                     btnRecord.style.backgroundColor = "";
                     btnText.innerText = "BẤM HỌC";
-                    if (callback) callback(); // Gọi hàm tiếp theo (bật micro) sau khi hoàn thành đọc
+                    if (callback) callback(); 
                 };
 
                 utterance.onerror = () => {
@@ -357,20 +379,16 @@
             }
         }
 
-        // Xử lý sự kiện bấm nút Đầu Mèo chính
         function handleCatButtonClick() {
             if (!recognition) return;
 
-            // Nếu đang thu âm, nhấn vào sẽ dừng thu âm
             if (isListening) {
                 recognition.stop();
                 return;
             }
 
-            // Nếu mèo đang bận đọc mẫu, không cho nhấn loạn
             if (isSpeakingSample) return;
 
-            // Tiến trình: Đọc mẫu trước -> Sau đó tự kích hoạt Micro thu âm
             speakCurrentSentence(() => {
                 recognition.start();
             });
@@ -380,6 +398,8 @@
             if(autoNextTimeout) clearTimeout(autoNextTimeout);
             autoNextStatusElem.classList.add('hidden');
             if(window.speechSynthesis) window.speechSynthesis.cancel();
+            
+            clearButtonEffects(); // Reset hiệu ứng khi qua câu mới
 
             currentSentenceIndex = (currentSentenceIndex + 1) % sentences.length;
             
@@ -516,9 +536,15 @@
             scoreBar.style.width = `${scorePercentage}%`;
             scoreText.innerText = `${scorePercentage}%`;
 
+            // Xóa nhanh các class hiệu ứng cũ của lượt trước để kích hoạt lượt mới mượt mà
+            clearButtonEffects();
+
             if (scorePercentage > 90) {
                 statusElem.innerText = "Meo meo! Đỉnh quá sen ơi! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
+                
+                // [CẢI TIẾN]: Kích hoạt hiệu ứng phát sáng viền màu hồng đậm bằng bóng đổ nhòe rộng (Box-shadow Neon) và đổi màu vòng ring ngoài
+                btnRecord.classList.add('shadow-[0_0_25px_rgba(244,31,95,0.85)]', 'ring-rose-500');
                 
                 playMeowSound('meow');
                 triggerFireworks();
@@ -528,6 +554,12 @@
                 }, 2500);
             } else {
                 statusElem.innerText = "Hụt mất rồi! Mèo đang gừ giận/an ủi đó nha~";
+                
+                // [CẢI TIẾN]: Thêm class rung lắc mặt mèo. Sử dụng setTimeout siêu ngắn để trình duyệt cập nhật lại DOM, ép hiệu ứng chạy lại từ đầu.
+                setTimeout(() => {
+                    btnRecord.classList.add('animate-shake');
+                }, 10);
+
                 playMeowSound('purr');
             }
         }
