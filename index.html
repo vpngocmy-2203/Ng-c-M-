@@ -3,63 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI English Pronunciation Checker (Pro - Pastel Pink)</title>
+    <title>Meow Pronunciation Coach 🐾</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Nhúng Google Font chữ bo tròn siêu dễ thương -->
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        /* Giữ nguyên màu xanh cho từ đúng và đỏ cho từ sai để đảm bảo tính năng chấm điểm rõ ràng */
+        body { font-family: 'Comfortaa', cursive, sans-serif; }
         .correct { color: #10B981; font-weight: bold; }
         .incorrect { color: #EF4444; font-weight: bold; text-decoration: line-through; }
+        
+        /* Hiệu ứng tai mèo ở phía trên chiếc hộp */
+        .cat-box::before {
+            content: "▲";
+            color: white;
+            text-shadow: 0 -4px 10px rgba(244, 63, 94, 0.1);
+            font-size: 38px;
+            position: absolute;
+            top: -28px;
+            left: 40px;
+        }
+        .cat-box::after {
+            content: "▲";
+            color: white;
+            text-shadow: 0 -4px 10px rgba(244, 63, 94, 0.1);
+            font-size: 38px;
+            position: absolute;
+            top: -28px;
+            right: 40px;
+        }
     </style>
 </head>
-<body class="bg-pink-50/50 font-sans min-h-screen flex items-center justify-center p-4">
+<!-- Nền hồng pastel ngọt ngào kèm theo các icon chân mèo bay bổng -->
+<body class="bg-pink-100/60 min-h-screen flex items-center justify-center p-4 relative overflow-x-hidden">
+    
+    <!-- Các icon trang trí nền xung quanh -->
+    <div class="absolute text-pink-200 text-4xl top-10 left-10 select-none animate-bounce">🐾</div>
+    <div class="absolute text-pink-200 text-4xl bottom-10 right-10 select-none animate-bounce" style="animation-delay: 1s;">🐱</div>
+    <div class="absolute text-pink-200 text-3xl top-1/2 right-8 select-none opacity-50">✨</div>
+    <div class="absolute text-pink-200 text-3xl bottom-1/3 left-8 select-none opacity-50">✨</div>
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-pink-100 relative z-10">
+    <!-- Hộp tính năng chính mang kiểu dáng mèo con (cat-box) -->
+    <div class="cat-box bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border-4 border-pink-200 relative z-10">
+        
+        <!-- Tiêu đề dễ thương -->
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-bold text-pink-600">🇺🇸 Pronunciation Coach</h1>
-            <span id="progress-text" class="text-xs bg-pink-100 text-pink-700 px-2.5 py-1 rounded-full font-semibold">Câu 1/7</span>
+            <h1 class="text-xl font-bold text-pink-500 flex items-center gap-1.5">
+                <span>🐱</span> Meow Coach
+            </h1>
+            <span id="progress-text" class="text-xs bg-pink-200 text-pink-700 px-3 py-1 rounded-full font-bold shadow-xs">Câu 1/9</span>
         </div>
         
+        <!-- Khu vực câu mẫu thiết kế như Bong bóng lời nói của mèo -->
         <div class="mb-6">
-            <p class="text-sm text-gray-500 font-medium mb-1">Câu mẫu (Chuẩn American English):</p>
-            <div id="target-text" class="text-lg font-semibold text-gray-800 bg-pink-50 p-4 rounded-xl border border-pink-100 min-h-[60px] flex items-center">
+            <p class="text-xs text-pink-400 font-bold mb-1 flex items-center gap-1">🐾 Thử thách phát âm Mỹ:</p>
+            <div id="target-text" class="text-lg font-bold text-gray-700 bg-pink-50 p-4 rounded-2xl border-2 border-dashed border-pink-200 min-h-[60px] flex items-center relative">
                 Loading...
             </div>
             <div class="flex justify-between items-center mt-2">
-                <span id="auto-next-status" class="text-xs text-emerald-600 font-medium animate-pulse hidden">✨ Chuẩn xác >90%! Đang chuyển câu...</span>
-                <button onclick="changeSentence()" class="text-xs text-pink-500 hover:text-pink-700 font-medium ml-auto">
-                    🔄 Bỏ qua câu này
+                <span id="auto-next-status" class="text-xs text-emerald-500 font-bold animate-pulse hidden">✨ Meo! Xuất sắc >90%! Đổi câu...</span>
+                <button onclick="changeSentence()" class="text-xs text-pink-400 hover:text-pink-600 font-bold ml-auto transition-colors">
+                    Next câu khác 🐾
                 </button>
             </div>
         </div>
 
-        <div class="flex flex-col items-center justify-center gap-4 my-6">
-            <button id="btn-record" onclick="toggleListening()" class="w-20 h-20 bg-pink-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-pink-600 transition-all focus:outline-none ring-4 ring-pink-100">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+        <!-- Khu vực Micro tròn, bọc viền dấu chân mèo -->
+        <div class="flex flex-col items-center justify-center gap-3 my-6">
+            <button id="btn-record" onclick="toggleListening()" class="w-24 h-24 bg-pink-400 text-white rounded-full flex flex-col items-center justify-center shadow-lg hover:bg-pink-500 hover:scale-105 transition-all focus:outline-none ring-8 ring-pink-100 cursor-pointer relative">
+                <!-- Icon Micro kết hợp biểu tượng mèo -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                 </svg>
+                <span class="text-[10px] font-bold tracking-wider">BẤM NÓI</span>
             </button>
-            <p id="status" class="text-sm text-gray-500 italic text-center">Nhấn nút và bắt đầu nói...</p>
+            <p id="status" class="text-xs text-pink-400 font-bold text-center mt-2 bg-pink-50/80 px-4 py-1 rounded-full">Nhấn nút và nói cho mèo nghe nha...</p>
         </div>
 
-        <div class="space-y-4 pt-4 border-t border-gray-100">
+        <!-- Bảng hiển thị kết quả -->
+        <div class="space-y-4 pt-4 border-t-2 border-dashed border-pink-100">
             <div>
-                <p class="text-sm text-gray-500 font-medium">Bạn đã nói:</p>
-                <p id="result-text" class="text-gray-700 italic min-h-[24px]">—</p>
+                <p class="text-xs text-gray-400 font-bold">Mèo nghe thấy:</p>
+                <p id="result-text" class="text-gray-600 italic min-h-[24px] text-sm bg-gray-50/50 p-2 rounded-xl border border-gray-100 mt-1">—</p>
             </div>
             
             <div>
-                <p class="text-sm text-gray-500 font-medium">Phân tích chi tiết:</p>
-                <div id="analysis-text" class="text-gray-700 min-h-[24px]">—</div>
+                <p class="text-xs text-gray-400 font-bold">Mèo sửa lỗi:</p>
+                <div id="analysis-text" class="text-sm min-h-[24px] bg-gray-50/50 p-2 rounded-xl border border-gray-100 mt-1">—</div>
             </div>
 
             <div>
-                <p class="text-sm text-gray-500 font-medium">Điểm số:</p>
-                <div class="flex items-center gap-2 mt-1">
-                    <div class="w-full bg-pink-100 h-3 rounded-full overflow-hidden">
-                        <div id="score-bar" class="bg-pink-500 h-full w-0 transition-all duration-500"></div>
-                    </div>
-                    <span id="score-text" class="text-lg font-bold text-pink-600">0%</span>
+                <p class="text-xs text-gray-400 font-bold flex justify-between">
+                    <span>Điểm Meow-score:</span>
+                    <span id="score-text" class="text-sm font-black text-pink-500">0%</span>
+                </p>
+                <!-- Thanh điểm màu hồng bo tròn kẹo ngọt -->
+                <div class="w-full bg-pink-100 h-3.5 rounded-full overflow-hidden mt-1 p-0.5 border border-pink-200">
+                    <div id="score-bar" class="bg-gradient-to-r from-pink-400 to-rose-400 h-full w-0 rounded-full transition-all duration-500"></div>
                 </div>
             </div>
         </div>
@@ -109,17 +149,16 @@
                 if(autoNextTimeout) clearTimeout(autoNextTimeout);
                 autoNextStatusElem.classList.add('hidden');
 
-                statusElem.innerText = "Đang nghe... Hãy nói to, rõ ràng.";
-                // Khi thu âm, nút chuyển từ Hồng sang Đỏ cảnh báo và có hiệu ứng mạch đập
-                btnRecord.classList.remove('bg-pink-500', 'hover:bg-pink-600');
-                btnRecord.classList.add('bg-red-500', 'hover:bg-red-600', 'animate-pulse');
+                statusElem.innerText = "Mèo đang lắng nghe... Ngấu meo! 🐱";
+                btnRecord.classList.remove('bg-pink-400', 'hover:bg-pink-500', 'ring-pink-100');
+                btnRecord.classList.add('bg-rose-500', 'hover:bg-rose-600', 'animate-pulse', 'ring-rose-100');
             };
 
             recognition.onend = () => {
                 isListening = false;
-                statusElem.innerText = "Đang tính điểm...";
-                btnRecord.classList.remove('bg-red-500', 'hover:bg-red-600', 'animate-pulse');
-                btnRecord.classList.add('bg-pink-500', 'hover:bg-pink-600');
+                statusElem.innerText = "Mèo đang chấm điểm nha...";
+                btnRecord.classList.remove('bg-rose-500', 'hover:bg-rose-600', 'animate-pulse', 'ring-rose-100');
+                btnRecord.classList.add('bg-pink-400', 'hover:bg-pink-500', 'ring-pink-100');
             };
 
             recognition.onresult = (event) => {
@@ -129,10 +168,10 @@
             };
 
             recognition.onerror = (event) => {
-                statusElem.innerText = "Không nghe rõ, vui lòng thử lại! (Lỗi: " + event.error + ")";
+                statusElem.innerText = "Hic, không nghe rõ! Thử lại nha sen? (🐾)";
             };
         } else {
-            alert("Trình duyệt không hỗ trợ Web Speech API. Vui lòng mở bằng Google Chrome.");
+            alert("Trình duyệt không hỗ trợ Web Speech API. Hãy mở bằng Google Chrome nhé!");
         }
 
         function toggleListening() {
@@ -157,7 +196,7 @@
             analysisElem.innerHTML = "—";
             scoreBar.style.width = "0%";
             scoreText.innerText = "0%";
-            statusElem.innerText = "Nhấn nút và bắt đầu nói...";
+            statusElem.innerText = "Nhấn nút và nói cho mèo nghe nha...";
         }
 
         function cleanWord(word) {
@@ -167,7 +206,8 @@
         function triggerFireworks() {
             const duration = 1.5 * 1000; 
             const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            // Pháo giấy mang tông màu pastel hồng, trắng, vàng chanh siêu cá tính
+            const defaults = { startVelocity: 25, spread: 360, ticks: 60, zIndex: 99, colors: ['#ffb7b2', '#ffdac1', '#e2f0cb', '#b5ead7', '#ffffff'] };
 
             function randomInRange(min, max) {
                 return Math.random() * (max - min) + min;
@@ -180,15 +220,15 @@
                     return clearInterval(interval);
                 }
 
-                const particleCount = 50 * (timeLeft / duration);
+                const particleCount = 40 * (timeLeft / duration);
                 
                 confetti(Object.assign({}, defaults, { 
                     particleCount, 
-                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+                    origin: { x: randomInRange(0.1, 0.4), y: Math.random() - 0.2 } 
                 }));
                 confetti(Object.assign({}, defaults, { 
                     particleCount, 
-                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+                    origin: { x: randomInRange(0.6, 0.9), y: Math.random() - 0.2 } 
                 }));
             }, 250);
         }
@@ -220,7 +260,7 @@
             scoreText.innerText = `${scorePercentage}%`;
 
             if (scorePercentage > 90) {
-                statusElem.innerText = "Tuyệt vời! Phát âm chuẩn xác.";
+                statusElem.innerText = "Meo meo! Đỉnh quá sen ơi! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
                 
                 triggerFireworks();
@@ -229,7 +269,7 @@
                     changeSentence();
                 }, 2500);
             } else {
-                statusElem.innerText = "Chưa đạt chuẩn (>90%). Hãy thử lại câu này nhé!";
+                statusElem.innerText = "Hụt mất rồi! Phát âm lại cho chuẩn meo nha~";
             }
         }
     </script>
