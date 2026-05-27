@@ -6,7 +6,6 @@
     <title>Meow Pronunciation Coach 🐾</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Nhúng Google Font chữ bo tròn siêu dễ thương -->
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Comfortaa', cursive, sans-serif; }
@@ -34,19 +33,15 @@
         }
     </style>
 </head>
-<!-- Nền hồng pastel ngọt ngào kèm theo các icon chân mèo bay bổng -->
 <body class="bg-pink-100/60 min-h-screen flex items-center justify-center p-4 relative overflow-x-hidden">
     
-    <!-- Các icon trang trí nền xung quanh -->
     <div class="absolute text-pink-200 text-4xl top-10 left-10 select-none animate-bounce">🐾</div>
     <div class="absolute text-pink-200 text-4xl bottom-10 right-10 select-none animate-bounce" style="animation-delay: 1s;">🐱</div>
     <div class="absolute text-pink-200 text-3xl top-1/2 right-8 select-none opacity-50">✨</div>
     <div class="absolute text-pink-200 text-3xl bottom-1/3 left-8 select-none opacity-50">✨</div>
 
-    <!-- Hộp tính năng chính mang kiểu dáng mèo con (cat-box) -->
     <div class="cat-box bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border-4 border-pink-200 relative z-10">
         
-        <!-- Tiêu đề dễ thương -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-xl font-bold text-pink-500 flex items-center gap-1.5">
                 <span>🐱</span> Meow Coach
@@ -54,7 +49,6 @@
             <span id="progress-text" class="text-xs bg-pink-200 text-pink-700 px-3 py-1 rounded-full font-bold shadow-xs">Câu 1/9</span>
         </div>
         
-        <!-- Khu vực câu mẫu thiết kế như Bong bóng lời nói của mèo -->
         <div class="mb-6">
             <p class="text-xs text-pink-400 font-bold mb-1 flex items-center gap-1">🐾 Thử thách phát âm Mỹ:</p>
             <div id="target-text" class="text-lg font-bold text-gray-700 bg-pink-50 p-4 rounded-2xl border-2 border-dashed border-pink-200 min-h-[60px] flex items-center relative">
@@ -68,10 +62,8 @@
             </div>
         </div>
 
-        <!-- Khu vực Micro tròn, bọc viền dấu chân mèo -->
         <div class="flex flex-col items-center justify-center gap-3 my-6">
             <button id="btn-record" onclick="toggleListening()" class="w-24 h-24 bg-pink-400 text-white rounded-full flex flex-col items-center justify-center shadow-lg hover:bg-pink-500 hover:scale-105 transition-all focus:outline-none ring-8 ring-pink-100 cursor-pointer relative">
-                <!-- Icon Micro kết hợp biểu tượng mèo -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                 </svg>
@@ -80,7 +72,6 @@
             <p id="status" class="text-xs text-pink-400 font-bold text-center mt-2 bg-pink-50/80 px-4 py-1 rounded-full">Nhấn nút và nói cho mèo nghe nha...</p>
         </div>
 
-        <!-- Bảng hiển thị kết quả -->
         <div class="space-y-4 pt-4 border-t-2 border-dashed border-pink-100">
             <div>
                 <p class="text-xs text-gray-400 font-bold">Mèo nghe thấy:</p>
@@ -97,7 +88,6 @@
                     <span>Điểm Meow-score:</span>
                     <span id="score-text" class="text-sm font-black text-pink-500">0%</span>
                 </p>
-                <!-- Thanh điểm màu hồng bo tròn kẹo ngọt -->
                 <div class="w-full bg-pink-100 h-3.5 rounded-full overflow-hidden mt-1 p-0.5 border border-pink-200">
                     <div id="score-bar" class="bg-gradient-to-r from-pink-400 to-rose-400 h-full w-0 rounded-full transition-all duration-500"></div>
                 </div>
@@ -196,17 +186,50 @@
             analysisElem.innerHTML = "—";
             scoreBar.style.width = "0%";
             scoreText.innerText = "0%";
-            statusElem.innerText = "Nhấn nút và nói cho mèo nghe nha...";
+            statusElem.innerText = "Nhấn nút và bắt đầu nói...";
         }
 
         function cleanWord(word) {
             return word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
         }
 
+        // HÀM TẠO TIẾNG MÈO KÊU TỰ ĐỘNG BẰNG CODE (WEB AUDIO API)
+        function playMeowSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'triangle'; // Tạo sóng âm mềm mại
+                
+                const now = ctx.currentTime;
+                
+                // Giả lập tần số âm thanh uốn lượn của tiếng "Mẻ-o-u"
+                osc.frequency.setValueAtTime(400, now); // Bắt đầu âm cao vừa râm ran
+                osc.frequency.exponentialRampToValueAtTime(750, now + 0.12); // Vút cao lên chữ "e"
+                osc.frequency.exponentialRampToValueAtTime(320, now + 0.45); // Hạ giọng xuống âm "u" nhẹ ở cuối
+                
+                // Điều khiển độ lớn nhỏ (Volume Envelope) để tiếng kêu tự nhiên
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.2, now + 0.05); // Tăng nhanh âm lượng
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45); // Nhỏ dần rồi tắt hẳn
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start(now);
+                osc.stop(now + 0.45);
+            } catch (e) {
+                console.log("AudioContext chưa được kích hoạt hoặc không hỗ trợ:", e);
+            }
+        }
+
         function triggerFireworks() {
             const duration = 1.5 * 1000; 
             const animationEnd = Date.now() + duration;
-            // Pháo giấy mang tông màu pastel hồng, trắng, vàng chanh siêu cá tính
             const defaults = { startVelocity: 25, spread: 360, ticks: 60, zIndex: 99, colors: ['#ffb7b2', '#ffdac1', '#e2f0cb', '#b5ead7', '#ffffff'] };
 
             function randomInRange(min, max) {
@@ -263,6 +286,8 @@
                 statusElem.innerText = "Meo meo! Đỉnh quá sen ơi! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
                 
+                // KÍCH HOẠT TIẾNG MÈO KÊU ĐỒNG THỜI VỚI PHÁO HOA
+                playMeowSound();
                 triggerFireworks();
                 
                 autoNextTimeout = setTimeout(() => {
