@@ -6,7 +6,7 @@
     <title>Meow Pronunciation Coach 🐾</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght=500;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Comfortaa', cursive, sans-serif; }
         .correct { color: #10B981; font-weight: bold; }
@@ -31,6 +31,22 @@
             top: -28px;
             right: 40px;
         }
+
+        /* CUSTOM CSS CHO NÚT CHÂN MÈO */
+        .cat-toe {
+            position: absolute;
+            background-color: inherit; /* Ăn theo màu hồng của nút cha */
+            border-radius: 50%;
+            width: 24px;
+            height: 30px;
+            top: -12px;
+            transition: all 0.3s ease;
+        }
+        /* Định vị 4 ngón chân xinh xắn */
+        .toe-1 { left: 4px; transform: rotate(-25deg); }
+        .toe-2 { left: 26px; top: -18px; transform: rotate(-10deg); }
+        .toe-3 { right: 26px; top: -18px; transform: rotate(10deg); }
+        .toe-4 { right: 4px; transform: rotate(25deg); }
     </style>
 </head>
 <body class="bg-pink-100/60 min-h-screen flex items-center justify-center p-4 relative overflow-x-hidden">
@@ -62,13 +78,19 @@
             </div>
         </div>
 
-        <div class="flex flex-col items-center justify-center gap-3 my-6">
-            <button id="btn-record" onclick="toggleListening()" class="w-24 h-24 bg-pink-400 text-white rounded-full flex flex-col items-center justify-center shadow-lg hover:bg-pink-500 hover:scale-105 transition-all focus:outline-none ring-8 ring-pink-100 cursor-pointer relative">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                </svg>
-                <span class="text-[10px] font-bold tracking-wider">BẤM NÓI</span>
-            </button>
+        <div class="flex flex-col items-center justify-center gap-3 my-8">
+            <div class="relative pt-6"> <button id="btn-record" onclick="toggleListening()" class="w-28 h-24 bg-pink-400 text-white rounded-[40px_40px_50px_50px] flex flex-col items-center justify-end pb-3 shadow-lg hover:bg-pink-500 hover:scale-105 transition-all focus:outline-none ring-8 ring-pink-100 cursor-pointer relative">
+                    <div class="cat-toe toe-1"></div>
+                    <div class="cat-toe toe-2"></div>
+                    <div class="cat-toe toe-3"></div>
+                    <div class="cat-toe toe-4"></div>
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-0.5 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    <span class="text-[10px] font-bold tracking-wider z-10">BẤM NÓI</span>
+                </button>
+            </div>
             <p id="status" class="text-xs text-pink-400 font-bold text-center mt-2 bg-pink-50/80 px-4 py-1 rounded-full">Nhấn nút và nói cho mèo nghe nha...</p>
         </div>
 
@@ -193,7 +215,6 @@
             return word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
         }
 
-        // HÀM TẠO TIẾNG MÈO KÊU TỰ ĐỘNG BẰNG CODE (WEB AUDIO API)
         function playMeowSound() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -203,19 +224,17 @@
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 
-                osc.type = 'triangle'; // Tạo sóng âm mềm mại
+                osc.type = 'triangle'; 
                 
                 const now = ctx.currentTime;
                 
-                // Giả lập tần số âm thanh uốn lượn của tiếng "Mẻ-o-u"
-                osc.frequency.setValueAtTime(400, now); // Bắt đầu âm cao vừa râm ran
-                osc.frequency.exponentialRampToValueAtTime(750, now + 0.12); // Vút cao lên chữ "e"
-                osc.frequency.exponentialRampToValueAtTime(320, now + 0.45); // Hạ giọng xuống âm "u" nhẹ ở cuối
+                osc.frequency.setValueAtTime(400, now); 
+                osc.frequency.exponentialRampToValueAtTime(750, now + 0.12); 
+                osc.frequency.exponentialRampToValueAtTime(320, now + 0.45); 
                 
-                // Điều khiển độ lớn nhỏ (Volume Envelope) để tiếng kêu tự nhiên
                 gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.2, now + 0.05); // Tăng nhanh âm lượng
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45); // Nhỏ dần rồi tắt hẳn
+                gain.gain.linearRampToValueAtTime(0.2, now + 0.05); 
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45); 
                 
                 osc.connect(gain);
                 gain.connect(ctx.destination);
@@ -286,7 +305,6 @@
                 statusElem.innerText = "Meo meo! Đỉnh quá sen ơi! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
                 
-                // KÍCH HOẠT TIẾNG MÈO KÊU ĐỒNG THỜI VỚI PHÁO HOA
                 playMeowSound();
                 triggerFireworks();
                 
