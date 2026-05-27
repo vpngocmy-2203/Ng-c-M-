@@ -114,7 +114,12 @@
         </div>
         
         <div class="mb-6">
-            <p class="text-xs text-pink-400 font-bold mb-1 flex items-center gap-1">🐾 Thử thách phát âm Mỹ:</p>
+            <div class="flex justify-between items-center mb-1">
+                <p class="text-xs text-pink-400 font-bold flex items-center gap-1">🐾 Thử thách phát âm Mỹ:</p>
+                <button onclick="speakCurrentSentence()" class="text-xs text-pink-500 hover:text-pink-700 font-bold flex items-center gap-0.5 transition-colors">
+                    🔊 Nghe mẫu
+                </button>
+            </div>
             <div id="target-text" class="text-lg font-bold text-gray-700 bg-pink-50 p-4 rounded-2xl border-2 border-dashed border-pink-200 min-h-[60px] flex items-center relative">
                 Loading...
             </div>
@@ -128,7 +133,7 @@
 
         <div class="flex flex-col items-center justify-center gap-3 my-8">
             <div class="relative pt-4"> 
-                <button id="btn-record" onclick="toggleListening()" class="cat-head-btn text-white focus:outline-none ring-8 ring-pink-100 hover:scale-105 transition-all">
+                <button id="btn-record" onclick="handleCatButtonClick()" class="cat-head-btn text-white focus:outline-none ring-8 ring-pink-100 hover:scale-105 transition-all">
                     <div class="cat-eyes"></div>
                     <div class="cat-whiskers-l"></div>
                     <div class="cat-whiskers-r"></div>
@@ -136,10 +141,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-4 mb-0.5 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                     </svg>
-                    <span class="text-[9px] font-black tracking-wider z-10 uppercase">BẤM NÓI</span>
+                    <span id="btn-text" class="text-[9px] font-black tracking-wider z-10 uppercase">BẤM HỌC</span>
                 </button>
             </div>
-            <p id="status" class="text-xs text-pink-400 font-bold text-center mt-3 bg-pink-50/80 px-4 py-1 rounded-full">Nhấn đầu mèo và nói cho mèo nghe nha...</p>
+            <p id="status" class="text-xs text-pink-400 font-bold text-center mt-3 bg-pink-50/80 px-4 py-1 rounded-full">Nhấn đầu mèo, mèo sẽ đọc mẫu rồi sen đọc theo nhé!</p>
         </div>
 
         <div class="space-y-4 pt-4 border-t-2 border-dashed border-pink-100">
@@ -178,28 +183,26 @@
             height = canvas.height = window.innerHeight;
         });
 
-        // Danh sách các icon mini siêu đáng yêu liên quan đến mèo
         const catIcons = ['🐱', '🐾', '🐈', '😸', '😻', '😽', '🐟', '🧶', '✨'];
         const particles = [];
-        const particleCount = 45; // Bạn có thể tăng/giảm số lượng icon ở đây
+        const particleCount = 45;
 
         class CatParticle {
             constructor() {
                 this.reset();
-                // Cho các icon rải rác ngẫu nhiên trên màn hình ở lần đầu tải trang
                 this.y = Math.random() * height; 
             }
 
             reset() {
                 this.x = Math.random() * width;
-                this.y = -30; // Chạy từ phía trên đỉnh màn hình xuống
+                this.y = -30;
                 this.icon = catIcons[Math.floor(Math.random() * catIcons.length)];
-                this.size = Math.random() * 14 + 14; // Kích thước mini từ 14px đến 28px
-                this.speedY = Math.random() * 0.6 + 0.4; // Tốc độ rơi nhẹ nhàng
-                this.speedX = Math.random() * 0.4 - 0.2; // Độ đung đưa trái phải
-                this.opacity = Math.random() * 0.25 + 0.15; // Độ mờ sương (để không làm rối mắt app chính)
+                this.size = Math.random() * 14 + 14;
+                this.speedY = Math.random() * 0.6 + 0.4;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.opacity = Math.random() * 0.25 + 0.15;
                 this.angle = Math.random() * Math.PI * 2;
-                this.spin = Math.random() * 0.01 - 0.005; // Độ xoay nhẹ tửng icon
+                this.spin = Math.random() * 0.01 - 0.005;
             }
 
             update() {
@@ -207,7 +210,6 @@
                 this.x += this.speedX;
                 this.angle += this.spin;
 
-                // Nếu chạy hết cuối màn hình thì reset lên lại đỉnh đầu
                 if (this.y > height + 30 || this.x < -30 || this.x > width + 30) {
                     this.reset();
                 }
@@ -226,12 +228,10 @@
             }
         }
 
-        // Khởi tạo cụm icon ban đầu
         for (let i = 0; i < particleCount; i++) {
             particles.push(new CatParticle());
         }
 
-        // Vòng lặp chạy hoạt ảnh mượt mà 60fps
         function animateBackground() {
             ctxBg.clearRect(0, 0, width, height);
             particles.forEach(p => {
@@ -243,17 +243,17 @@
         animateBackground();
 
 
-        // --- LOGIC MEOW APP CHÍNH CỦA BẠN (GIỮ NGUYÊN) ---
+        // --- LOGIC MEOW APP CHÍNH ---
         const sentences = [
             "How is the weather today?",
             "I would like to order a cup of coffee.",
             "Practice makes perfect.",
-            " This summer I will visit new country.",
+            "This summer I will visit new country.",
             "Can you tell me how to get to the station?",
             "A cat is very beautiful",
             "The sky is blue",
-            " Try your best",
-            " I have breakfast every morning"
+            "Try your best",
+            "I have breakfast every morning"
         ];
 
         let currentSentenceIndex = 0;
@@ -263,6 +263,7 @@
         const progressTextElem = document.getElementById('progress-text');
         const autoNextStatusElem = document.getElementById('auto-next-status');
         const btnRecord = document.getElementById('btn-record');
+        const btnText = document.getElementById('btn-text');
         const statusElem = document.getElementById('status');
         const resultTextElem = document.getElementById('result-text');
         const analysisElem = document.getElementById('analysis-text');
@@ -275,6 +276,7 @@
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         let isListening = false;
+        let isSpeakingSample = false; // Trạng thái kiểm tra xem Mèo có đang đọc mẫu không
 
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
@@ -287,8 +289,9 @@
                 if(autoNextTimeout) clearTimeout(autoNextTimeout);
                 autoNextStatusElem.classList.add('hidden');
 
-                statusElem.innerText = "Mèo đang lắng nghe... Ngấu meo! 🐱";
-                btnRecord.style.backgroundColor = "#f43f5e"; 
+                statusElem.innerText = "Mèo đang lắng nghe... Nói đi sen ơi! 🐱";
+                btnText.innerText = "ĐANG NGHE";
+                btnRecord.style.backgroundColor = "#f43f5e"; // Đổi sang màu hồng đậm khi nghe
                 btnRecord.classList.remove('ring-pink-100');
                 btnRecord.classList.add('animate-pulse', 'ring-rose-100');
             };
@@ -296,6 +299,7 @@
             recognition.onend = () => {
                 isListening = false;
                 statusElem.innerText = "Mèo đang chấm điểm nha...";
+                btnText.innerText = "BẤM HỌC";
                 btnRecord.style.backgroundColor = ""; 
                 btnRecord.classList.remove('animate-pulse', 'ring-rose-100');
                 btnRecord.classList.add('ring-pink-100');
@@ -314,18 +318,68 @@
             alert("Trình duyệt không hỗ trợ Web Speech API. Hãy mở bằng Google Chrome nhé!");
         }
 
-        function toggleListening() {
+        // Hàm giúp mèo đọc mẫu tiếng Anh câu hiện tại
+        function speakCurrentSentence(callback) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Tắt giọng đọc cũ nếu có
+                
+                const utterance = new SpeechSynthesisUtterance(targetTextElem.innerText);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; // Đọc hơi chậm một xíu cho chuẩn học tập
+
+                utterance.onstart = () => {
+                    isSpeakingSample = true;
+                    statusElem.innerText = "Mèo đang đọc mẫu tiếng Mỹ... Hãy lắng nghe 🔊";
+                    btnText.innerText = "MÈO ĐANG ĐỌC";
+                    btnRecord.style.backgroundColor = "#a855f7"; // Đổi nút sang màu tím khi mèo đang đọc mẫu
+                    btnRecord.classList.add('animate-bounce'); // Hiệu ứng nhún nhảy vui nhộn
+                };
+
+                utterance.onend = () => {
+                    isSpeakingSample = false;
+                    btnRecord.classList.remove('animate-bounce');
+                    btnRecord.style.backgroundColor = "";
+                    btnText.innerText = "BẤM HỌC";
+                    if (callback) callback(); // Gọi hàm tiếp theo (bật micro) sau khi hoàn thành đọc
+                };
+
+                utterance.onerror = () => {
+                    isSpeakingSample = false;
+                    btnRecord.classList.remove('animate-bounce');
+                    btnRecord.style.backgroundColor = "";
+                    btnText.innerText = "BẤM HỌC";
+                    if (callback) callback();
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                if (callback) callback();
+            }
+        }
+
+        // Xử lý sự kiện bấm nút Đầu Mèo chính
+        function handleCatButtonClick() {
             if (!recognition) return;
+
+            // Nếu đang thu âm, nhấn vào sẽ dừng thu âm
             if (isListening) {
                 recognition.stop();
-            } else {
-                recognition.start();
+                return;
             }
+
+            // Nếu mèo đang bận đọc mẫu, không cho nhấn loạn
+            if (isSpeakingSample) return;
+
+            // Tiến trình: Đọc mẫu trước -> Sau đó tự kích hoạt Micro thu âm
+            speakCurrentSentence(() => {
+                recognition.start();
+            });
         }
 
         function changeSentence() {
             if(autoNextTimeout) clearTimeout(autoNextTimeout);
             autoNextStatusElem.classList.add('hidden');
+            if(window.speechSynthesis) window.speechSynthesis.cancel();
 
             currentSentenceIndex = (currentSentenceIndex + 1) % sentences.length;
             
@@ -336,7 +390,7 @@
             analysisElem.innerHTML = "—";
             scoreBar.style.width = "0%";
             scoreText.innerText = "0%";
-            statusElem.innerText = "Nhấn đầu mèo và bắt đầu nói...";
+            statusElem.innerText = "Nhấn đầu mèo, mèo sẽ đọc mẫu rồi sen đọc theo nhé!";
         }
 
         function cleanWord(word) {
@@ -403,7 +457,7 @@
                     osc.stop(now + 0.9);
                 }
             } catch (e) {
-                console.log("AudioContext gặp lỗi hoặc trình duyệt chưa cấp quyền âm thanh:", e);
+                console.log("AudioContext gặp lỗi:", e);
             }
         }
 
