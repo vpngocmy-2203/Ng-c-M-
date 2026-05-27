@@ -12,7 +12,7 @@
         .correct { color: #10B981; font-weight: bold; }
         .incorrect { color: #EF4444; font-weight: bold; text-decoration: line-through; }
         
-        /* Hiệu ứng tai mèo ở phía trên chiếc hộp */
+        /* Hiệu ứng tai mèo ở phía trên chiếc hộp đựng ứng dụng */
         .cat-box::before {
             content: "▲";
             color: white;
@@ -32,21 +32,72 @@
             right: 40px;
         }
 
-        /* CUSTOM CSS CHO NÚT CHÂN MÈO */
-        .cat-toe {
+        /* --- CSS TẠO HÌNH ĐẦU MÈO CHO NÚT BẤM --- */
+        .cat-head-btn {
+            position: relative;
+            width: 120px;
+            height: 100px;
+            background-color: #f472b6; /* bg-pink-400 */
+            border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: 0 8px 15px rgba(244, 114, 182, 0.3);
+        }
+
+        /* Tai mèo bên trái và bên phải */
+        .cat-head-btn::before, .cat-head-btn::after {
+            content: "";
             position: absolute;
-            background-color: inherit; /* Ăn theo màu hồng của nút cha */
-            border-radius: 50%;
-            width: 24px;
-            height: 30px;
-            top: -12px;
+            top: -8px;
+            width: 32px;
+            height: 35px;
+            background-color: inherit;
+            border-radius: 30% 70% 30% 70% / 30% 70% 30% 70%;
+            z-index: -1;
             transition: all 0.3s ease;
         }
-        /* Định vị 4 ngón chân xinh xắn */
-        .toe-1 { left: 4px; transform: rotate(-25deg); }
-        .toe-2 { left: 26px; top: -18px; transform: rotate(-10deg); }
-        .toe-3 { right: 26px; top: -18px; transform: rotate(10deg); }
-        .toe-4 { right: 4px; transform: rotate(25deg); }
+        .cat-head-btn::before {
+            left: 6px;
+            transform: rotate(-35deg);
+        }
+        .cat-head-btn::after {
+            right: 6px;
+            transform: rotate(35deg);
+            border-radius: 70% 30% 70% 30% / 70% 30% 70% 30%;
+        }
+
+        /* Chi tiết mắt và râu bên trong mặt mèo */
+        .cat-eyes {
+            position: absolute;
+            top: 32px;
+            width: 76px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .cat-eyes::before, .cat-eyes::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+        }
+
+        .cat-whiskers-l, .cat-whiskers-r {
+            position: absolute;
+            top: 42px;
+            width: 20px;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+        }
+        .cat-whiskers-l { left: -10px; transform: rotate(10deg); box-shadow: 0 8px 0 rgba(255, 255, 255, 0.6); }
+        .cat-whiskers-r { right: -10px; transform: rotate(-10deg); box-shadow: 0 8px 0 rgba(255, 255, 255, 0.6); }
     </style>
 </head>
 <body class="bg-pink-100/60 min-h-screen flex items-center justify-center p-4 relative overflow-x-hidden">
@@ -79,19 +130,19 @@
         </div>
 
         <div class="flex flex-col items-center justify-center gap-3 my-8">
-            <div class="relative pt-6"> <button id="btn-record" onclick="toggleListening()" class="w-28 h-24 bg-pink-400 text-white rounded-[40px_40px_50px_50px] flex flex-col items-center justify-end pb-3 shadow-lg hover:bg-pink-500 hover:scale-105 transition-all focus:outline-none ring-8 ring-pink-100 cursor-pointer relative">
-                    <div class="cat-toe toe-1"></div>
-                    <div class="cat-toe toe-2"></div>
-                    <div class="cat-toe toe-3"></div>
-                    <div class="cat-toe toe-4"></div>
+            <div class="relative pt-4"> 
+                <button id="btn-record" onclick="toggleListening()" class="cat-head-btn text-white focus:outline-none ring-8 ring-pink-100 hover:scale-105 transition-all">
+                    <div class="cat-eyes"></div>
+                    <div class="cat-whiskers-l"></div>
+                    <div class="cat-whiskers-r"></div>
                     
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-0.5 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-4 mb-0.5 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                     </svg>
-                    <span class="text-[10px] font-bold tracking-wider z-10">BẤM NÓI</span>
+                    <span class="text-[9px] font-black tracking-wider z-10 uppercase">BẤM NÓI</span>
                 </button>
             </div>
-            <p id="status" class="text-xs text-pink-400 font-bold text-center mt-2 bg-pink-50/80 px-4 py-1 rounded-full">Nhấn nút và nói cho mèo nghe nha...</p>
+            <p id="status" class="text-xs text-pink-400 font-bold text-center mt-3 bg-pink-50/80 px-4 py-1 rounded-full">Nhấn đầu mèo và nói cho mèo nghe nha...</p>
         </div>
 
         <div class="space-y-4 pt-4 border-t-2 border-dashed border-pink-100">
@@ -162,15 +213,17 @@
                 autoNextStatusElem.classList.add('hidden');
 
                 statusElem.innerText = "Mèo đang lắng nghe... Ngấu meo! 🐱";
-                btnRecord.classList.remove('bg-pink-400', 'hover:bg-pink-500', 'ring-pink-100');
-                btnRecord.classList.add('bg-rose-500', 'hover:bg-rose-600', 'animate-pulse', 'ring-rose-100');
+                btnRecord.style.backgroundColor = "#f43f5e"; /* Đổi sang màu rose-500 bằng JS */
+                btnRecord.classList.remove('ring-pink-100');
+                btnRecord.classList.add('animate-pulse', 'ring-rose-100');
             };
 
             recognition.onend = () => {
                 isListening = false;
                 statusElem.innerText = "Mèo đang chấm điểm nha...";
-                btnRecord.classList.remove('bg-rose-500', 'hover:bg-rose-600', 'animate-pulse', 'ring-rose-100');
-                btnRecord.classList.add('bg-pink-400', 'hover:bg-pink-500', 'ring-pink-100');
+                btnRecord.style.backgroundColor = ""; /* Trở về mặc định màu hồng cũ */
+                btnRecord.classList.remove('animate-pulse', 'ring-rose-100');
+                btnRecord.classList.add('ring-pink-100');
             };
 
             recognition.onresult = (event) => {
@@ -208,41 +261,79 @@
             analysisElem.innerHTML = "—";
             scoreBar.style.width = "0%";
             scoreText.innerText = "0%";
-            statusElem.innerText = "Nhấn nút và bắt đầu nói...";
+            statusElem.innerText = "Nhấn đầu mèo và bắt đầu nói...";
         }
 
         function cleanWord(word) {
             return word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
         }
 
-        function playMeowSound() {
+        // HÀM PHÁT ÂM THANH MÈO: MEOW (KHI ĐẠT >90%) HOẶC GỪ RỪ RỪ (KHI <90%)
+        function playMeowSound(type = 'meow') {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContext) return;
                 
                 const ctx = new AudioContext();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                
-                osc.type = 'triangle'; 
-                
                 const now = ctx.currentTime;
-                
-                osc.frequency.setValueAtTime(400, now); 
-                osc.frequency.exponentialRampToValueAtTime(750, now + 0.12); 
-                osc.frequency.exponentialRampToValueAtTime(320, now + 0.45); 
-                
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.2, now + 0.05); 
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45); 
-                
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                
-                osc.start(now);
-                osc.stop(now + 0.45);
+
+                if (type === 'meow') {
+                    // --- TIẾNG MÈO KÊU MEOW CHÚC MỪNG ---
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    
+                    osc.frequency.setValueAtTime(380, now);
+                    osc.frequency.exponentialRampToValueAtTime(720, now + 0.12);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.45);
+                    
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.2, now + 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                    
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                    
+                } else {
+                    // --- TIẾNG MÈO GỪ RỪ RỪ (PURR) AN ỦI ---
+                    // Sử dụng bộ tạo dao động tần số rất thấp kết hợp điều chế biên độ liên tục
+                    const osc = ctx.createOscillator();
+                    const modulator = ctx.createOscillator();
+                    const modGain = ctx.createGain();
+                    const mainGain = ctx.createGain();
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(75, now); // Tần số gừ thấp trầm ấm
+                    
+                    modulator.type = 'sine';
+                    modulator.frequency.setValueAtTime(28, now); // Nhịp rung gừ rừ rừ
+                    modGain.gain.setValueAtTime(25, now); 
+                    
+                    mainGain.gain.setValueAtTime(0, now);
+                    mainGain.gain.linearRampToValueAtTime(0.25, now + 0.1);
+                    mainGain.gain.setValueAtTime(0.25, now + 0.7);
+                    mainGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+                    
+                    // Tạo bộ lọc tần số thấp để tiếng gừ mềm, không bị chói tai
+                    const filter = ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(140, now);
+                    
+                    modulator.connect(modGain);
+                    modGain.connect(osc.frequency);
+                    osc.connect(filter);
+                    filter.connect(mainGain);
+                    mainGain.connect(ctx.destination);
+                    
+                    modulator.start(now);
+                    osc.start(now);
+                    modulator.stop(now + 0.9);
+                    osc.stop(now + 0.9);
+                }
             } catch (e) {
-                console.log("AudioContext chưa được kích hoạt hoặc không hỗ trợ:", e);
+                console.log("AudioContext gặp lỗi hoặc trình duyệt chưa cấp quyền âm thanh:", e);
             }
         }
 
@@ -305,14 +396,17 @@
                 statusElem.innerText = "Meo meo! Đỉnh quá sen ơi! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
                 
-                playMeowSound();
+                // Phát tiếng Meow dễ thương và bắn pháo hoa
+                playMeowSound('meow');
                 triggerFireworks();
                 
                 autoNextTimeout = setTimeout(() => {
                     changeSentence();
                 }, 2500);
             } else {
-                statusElem.innerText = "Hụt mất rồi! Phát âm lại cho chuẩn meo nha~";
+                statusElem.innerText = "Hụt mất rồi! Mèo đang gừ giận/an ủi đó nha~";
+                // Phát tiếng mèo gừ trầm (purr) khi điểm thấp
+                playMeowSound('purr');
             }
         }
     </script>
