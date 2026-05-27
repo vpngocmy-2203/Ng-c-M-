@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght=500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Comfortaa', cursive, sans-serif; }
+        body { font-family: 'Comfortaa', cursive, sans-serif; transition: background-color 0.5s ease; }
         .correct { color: #10B981; font-weight: bold; }
         .incorrect { color: #EF4444; font-weight: bold; text-decoration: line-through; }
         
@@ -16,7 +16,7 @@
         .cat-box::before {
             content: "▲";
             color: white;
-            text-shadow: 0 -4px 10px rgba(244, 63, 94, 0.1);
+            text-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
             font-size: 38px;
             position: absolute;
             top: -28px;
@@ -25,7 +25,7 @@
         .cat-box::after {
             content: "▲";
             color: white;
-            text-shadow: 0 -4px 10px rgba(244, 63, 94, 0.1);
+            text-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
             font-size: 38px;
             position: absolute;
             top: -28px;
@@ -114,6 +114,30 @@
     
     <canvas id="cat-bg-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
 
+    <div class="absolute top-4 right-4 z-30">
+        <button onclick="toggleThemeMenu()" class="bg-white/80 backdrop-blur-xs p-2 rounded-full shadow-md hover:scale-110 active:scale-95 transition-all text-gray-500 hover:text-pink-500 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-[spin_8s_linear_infinite]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        </button>
+        <div id="theme-menu" class="hidden absolute right-0 mt-2 bg-white/95 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-pink-100 min-w-[160px] space-y-2">
+            <p class="text-[11px] font-bold text-gray-400 text-center mb-1">Màu nền Meow 🐾</p>
+            <button onclick="changeTheme('pink')" class="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-xl hover:bg-pink-50 text-pink-600 font-bold transition-colors cursor-pointer">
+                <span class="w-4 h-4 rounded-full bg-pink-300 border border-pink-400"></span> Hồng Sữa
+            </button>
+            <button onclick="changeTheme('purple')" class="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-xl hover:bg-purple-50 text-purple-600 font-bold transition-colors cursor-pointer">
+                <span class="w-4 h-4 rounded-full bg-purple-300 border border-purple-400"></span> Khoai Môn
+            </button>
+            <button onclick="changeTheme('green')" class="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-xl hover:bg-emerald-50 text-emerald-600 font-bold transition-colors cursor-pointer">
+                <span class="w-4 h-4 rounded-full bg-emerald-200 border border-emerald-300"></span> Bạc Hà
+            </button>
+            <button onclick="changeTheme('yellow')" class="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-xl hover:bg-amber-50 text-amber-600 font-bold transition-colors cursor-pointer">
+                <span class="w-4 h-4 rounded-full bg-amber-200 border border-amber-300"></span> Vàng Kem
+            </button>
+        </div>
+    </div>
+
     <div class="cat-box bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border-4 border-pink-200 relative z-10">
         
         <div class="flex justify-between items-center mb-6">
@@ -181,6 +205,60 @@
     </div>
 
     <script>
+        // --- ĐỊNH NGHĨA BỘ THEME MÀU PASTEL DỄ THƯƠNG ---
+        const themes = {
+            pink: {
+                bgClass: 'bg-pink-100/60',
+                canvasColors: ['🐱', '🐾', '🐈', '😸', '😻', '😽', '🐟', '¼', '✨']
+            },
+            purple: {
+                bgClass: 'bg-purple-100/60',
+                canvasColors: ['🔮', '🐾', '🐈', '🪻', '🦄', '✨', '🪐', '🍬', '🎵']
+            },
+            green: {
+                bgClass: 'bg-emerald-100/60',
+                canvasColors: ['🌱', '🐾', '🍀', '🍏', '🦖', '✨', '🐢', '🍵', '🌲']
+            },
+            yellow: {
+                bgClass: 'bg-amber-100/50',
+                canvasColors: ['🐥', '🐾', '🐱', '🍋', '🥞', '✨', '🧀', '🌟', '🍯']
+            }
+        };
+
+        let currentTheme = 'pink';
+
+        function toggleThemeMenu() {
+            const menu = document.getElementById('theme-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function changeTheme(themeName) {
+            if (!themes[themeName]) return;
+            
+            // Cập nhật class nền của body
+            document.body.className = `${themes[themeName].bgClass} min-h-screen flex items-center justify-center p-4 relative overflow-hidden`;
+            
+            currentTheme = themeName;
+            
+            // Đổi nhanh icon rơi trên Canvas cho phù hợp theme
+            particles.forEach(p => {
+                p.icon = themes[themeName].canvasColors[Math.floor(Math.random() * themes[themeName].canvasColors.length)];
+            });
+
+            // Ẩn menu sau khi chọn
+            document.getElementById('theme-menu').classList.add('hidden');
+        }
+
+        // Đóng menu khi bấm ra ngoài vùng cài đặt
+        window.addEventListener('click', function(e) {
+            const menu = document.getElementById('theme-menu');
+            const configBtn = menu.previousElementSibling;
+            if (!menu.contains(e.target) && !configBtn.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+
         // --- SCRIPT HOẠT HỌA ICON MÈO MINI TRÊN BACKGROUND ---
         const canvas = document.getElementById('cat-bg-canvas');
         const ctxBg = canvas.getContext('2d');
@@ -193,7 +271,6 @@
             height = canvas.height = window.innerHeight;
         });
 
-        const catIcons = ['🐱', '🐾', '🐈', '😸', '😻', '😽', '🐟', '🧶', '✨'];
         const particles = [];
         const particleCount = 45;
 
@@ -206,7 +283,8 @@
             reset() {
                 this.x = Math.random() * width;
                 this.y = -30;
-                this.icon = catIcons[Math.floor(Math.random() * catIcons.length)];
+                const pool = themes[currentTheme].canvasColors;
+                this.icon = pool[Math.floor(Math.random() * pool.length)];
                 this.size = Math.random() * 14 + 14;
                 this.speedY = Math.random() * 0.6 + 0.4;
                 this.speedX = Math.random() * 0.4 - 0.2;
@@ -288,7 +366,6 @@
         let isListening = false;
         let isSpeakingSample = false; 
 
-        // Hàm xóa toàn bộ hiệu ứng cũ trên nút mặt mèo trước lượt bấm/câu mới
         function clearButtonEffects() {
             btnRecord.classList.remove(
                 'shadow-[0_0_25px_rgba(244,31,95,0.85)]', 
@@ -308,7 +385,6 @@
                 if(autoNextTimeout) clearTimeout(autoNextTimeout);
                 autoNextStatusElem.classList.add('hidden');
                 
-                // Xóa hiệu ứng cũ khi bắt đầu ghi âm mới
                 clearButtonEffects();
 
                 statusElem.innerText = "Mèo đang lắng nghe... Nói đi sen ơi! 🐱";
@@ -350,7 +426,7 @@
 
                 utterance.onstart = () => {
                     isSpeakingSample = true;
-                    clearButtonEffects(); // Xóa hiệu ứng cũ trước khi đọc mẫu
+                    clearButtonEffects();
                     statusElem.innerText = "Mèo đang đọc mẫu tiếng Mỹ... Hãy lắng nghe 🔊";
                     btnText.innerText = "MÈO ĐANG ĐỌC";
                     btnRecord.style.backgroundColor = "#a855f7"; 
@@ -399,7 +475,7 @@
             autoNextStatusElem.classList.add('hidden');
             if(window.speechSynthesis) window.speechSynthesis.cancel();
             
-            clearButtonEffects(); // Reset hiệu ứng khi qua câu mới
+            clearButtonEffects();
 
             currentSentenceIndex = (currentSentenceIndex + 1) % sentences.length;
             
@@ -536,14 +612,12 @@
             scoreBar.style.width = `${scorePercentage}%`;
             scoreText.innerText = `${scorePercentage}%`;
 
-            // Xóa nhanh các class hiệu ứng cũ của lượt trước để kích hoạt lượt mới mượt mà
             clearButtonEffects();
 
             if (scorePercentage > 90) {
                 statusElem.innerText = "Meo meo! Đỉnh quá sen ơi! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
                 
-                // [CẢI TIẾN]: Kích hoạt hiệu ứng phát sáng viền màu hồng đậm bằng bóng đổ nhòe rộng (Box-shadow Neon) và đổi màu vòng ring ngoài
                 btnRecord.classList.add('shadow-[0_0_25px_rgba(244,31,95,0.85)]', 'ring-rose-500');
                 
                 playMeowSound('meow');
@@ -555,7 +629,6 @@
             } else {
                 statusElem.innerText = "Hụt mất rồi! Mèo đang gừ giận/an ủi đó nha~";
                 
-                // [CẢI TIẾN]: Thêm class rung lắc mặt mèo. Sử dụng setTimeout siêu ngắn để trình duyệt cập nhật lại DOM, ép hiệu ứng chạy lại từ đầu.
                 setTimeout(() => {
                     btnRecord.classList.add('animate-shake');
                 }, 10);
