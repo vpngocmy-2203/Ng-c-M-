@@ -179,7 +179,7 @@
             </div>
 
             <div class="flex justify-between items-center mt-2">
-                <span id="auto-next-status" class="text-xs text-emerald-500 font-bold animate-pulse hidden">✨ Meo! Xuất sắc >90%! Đổi câu...</span>
+                <span id="auto-next-status" class="text-xs text-emerald-500 font-bold animate-pulse hidden">✨ Meo! Xuất sắc ≥80%! Đổi câu...</span>
                 <button onclick="changeSentence()" class="text-xs dynamic-text-primary opacity-80 dynamic-text-hover font-bold ml-auto transition-colors">
                     Next câu khác 🐾
                 </button>
@@ -232,48 +232,48 @@
                 bgClass: 'bg-pink-100/60',
                 canvasColors: ['🐱', '🐾', '🐈', '😸', '😻', '😽', '🇨🇳', '✨'],
                 colors: {
-                    '--theme-primary': '#ec4899',
-                    '--theme-primary-hover': '#be185d',
-                    '--theme-light': '#fdf2f8',
-                    '--theme-border': '#fbcfe8',
-                    '--theme-btn-default': '#f472b6',
-                    '--theme-ring': '#fce7f3'
+                    --theme-primary: '#ec4899',
+                    --theme-primary-hover: '#be185d',
+                    --theme-light: '#fdf2f8',
+                    --theme-border: '#fbcfe8',
+                    --theme-btn-default: '#f472b6',
+                    --theme-ring: '#fce7f3'
                 }
             },
             purple: {
                 bgClass: 'bg-purple-100/60',
                 canvasColors: ['🔮', '🐾', '🐈', '🪻', '🦄', '✨', '🪐', '🍬', '🎵'],
                 colors: {
-                    '--theme-primary': '#a855f7',
-                    '--theme-primary-hover': '#7e22ce',
-                    '--theme-light': '#faf5ff',
-                    '--theme-border': '#e9d5ff',
-                    '--theme-btn-default': '#c084fc',
-                    '--theme-ring': '#f3e8ff'
+                    --theme-primary: '#a855f7',
+                    --theme-primary-hover: '#7e22ce',
+                    --theme-light: '#faf5ff',
+                    --theme-border: '#e9d5ff',
+                    --theme-btn-default: '#c084fc',
+                    --theme-ring: '#f3e8ff'
                 }
             },
             green: {
                 bgClass: 'bg-emerald-100/60',
                 canvasColors: ['🌱', '🐾', '🍀', '🍏', '✨', '🍵', '🌲'],
                 colors: {
-                    '--theme-primary': '#10b981',
-                    '--theme-primary-hover': '#047857',
-                    '--theme-light': '#ecfdf5',
-                    '--theme-border': '#a7f3d0',
-                    '--theme-btn-default': '#34d399',
-                    '--theme-ring': '#d1fae5'
+                    --theme-primary: '#10b981',
+                    --theme-primary-hover: '#047857',
+                    --theme-light: '#ecfdf5',
+                    --theme-border: '#a7f3d0',
+                    --theme-btn-default: '#34d399',
+                    --theme-ring: '#d1fae5'
                 }
             },
             yellow: {
                 bgClass: 'bg-amber-100/50',
                 canvasColors: ['🐥', '🐾', '🐱', '🍋', '🥞', '✨', '🧀', '🌟', '🍯'],
                 colors: {
-                    '--theme-primary': '#f59e0b',
-                    '--theme-primary-hover': '#b45309',
-                    '--theme-light': '#fff9db',
-                    '--theme-border': '#fde68a',
-                    '--theme-btn-default': '#fbbf24',
-                    '--theme-ring': '#fef3c7'
+                    --theme-primary: '#f59e0b',
+                    --theme-primary-hover: '#b45309',
+                    --theme-light: '#fff9db',
+                    --theme-border: '#fde68a',
+                    --theme-btn-default: '#fbbf24',
+                    --theme-ring: '#fef3c7'
                 }
             }
         };
@@ -586,7 +586,8 @@
 
             clearButtonEffects();
 
-            if (scorePercentage >= 90) {
+            // THAY ĐỔI LOGIC: Đạt từ 80% trở lên sẽ được qua câu tiếp theo
+            if (scorePercentage >= 80) {
                 statusElem.innerText = "Meo meo! Bạn phát âm chuẩn xác lắm! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
                 btnRecord.classList.add('shadow-[0_0_25px_rgba(244,31,95,0.85)]', 'ring-rose-500');
@@ -687,7 +688,7 @@
                     return clearInterval(interval);
                 }
 
-                const particleCount = 50 * (timeLeft / duration);
+                const particleCount = 20 * (timeLeft / duration);
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
             }, 250);
