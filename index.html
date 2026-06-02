@@ -173,8 +173,8 @@
             </div>
             
             <div class="dynamic-bg-light p-4 rounded-2xl border-2 border-dashed dynamic-border-theme min-h-[100px] flex flex-col justify-center relative">
-                <div id="pinyin-text" class="text-xs font-bold text-gray-400 tracking-wider mb-0.5">loading...</div>
-                <div id="target-text" class="text-2xl font-bold text-gray-800 tracking-wide mb-1">Loading...</div>
+                <div id="pinyin-text" class="text-[13.2px] font-bold text-gray-400 tracking-wider mb-0.5">loading...</div>
+                <div id="target-text" class="text-[26.4px] font-bold text-gray-800 tracking-wide mb-1">Loading...</div>
                 <div id="translation-text" class="text-xs text-gray-500 italic">loading...</div>
             </div>
 
@@ -682,12 +682,15 @@
 
             const interval = setInterval(function() {
                 const timeLeft = animationEnd - Date.now();
-                if (timeLeft <= 0) return clearInterval(interval);
 
-                const particleCount = 30 * (timeLeft / duration);
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.4), y: Math.random() - 0.2 } }));
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.6, 0.9), y: Math.random() - 0.2 } }));
-            }, 220);
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
         }
     </script>
 </body>
