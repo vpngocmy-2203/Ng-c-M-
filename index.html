@@ -159,18 +159,18 @@
             <div class="flex justify-between items-center mb-1">
                 <p class="text-xs dynamic-text-primary opacity-80 font-bold flex items-center gap-1">🐾 English Speaking Challenge:</p>
                 <button onclick="speakCurrentSentence()" class="text-xs dynamic-text-primary dynamic-text-hover font-bold flex items-center gap-0.5 transition-colors">
-                    🔊 Listen Model
+                    🔊 Listen Model (Nữ - Chậm)
                 </button>
             </div>
             
-            <div class="dynamic-bg-light p-4 rounded-2xl border-2 border-dashed dynamic-border-theme min-h-[100px] flex flex-col justify-center relative">
-                <div id="ipa-text" class="text-xs font-bold text-gray-400 tracking-wider mb-0.5">loading...</div>
-                <div id="target-text" class="text-xl font-bold text-gray-800 tracking-wide mb-1">Loading...</div>
-                <div id="translation-text" class="text-xs text-gray-500 italic">loading...</div>
+            <div class="dynamic-bg-light p-4 rounded-2xl border-2 border-dashed dynamic-border-theme min-h-[120px] flex flex-col justify-center relative">
+                <div id="ipa-text" class="text-xs font-bold text-gray-400 tracking-wider mb-1 font-sans">loading...</div>
+                <div id="target-text" class="text-xl font-bold text-gray-800 tracking-wide mb-1.5">Loading...</div>
+                <div id="translation-text" class="text-xs text-gray-500 font-semibold italic">loading...</div>
             </div>
 
             <div class="flex justify-between items-center mt-2">
-                <span id="auto-next-status" class="text-xs text-emerald-500 font-bold animate-pulse hidden">✨ Meow! Perfect >90%! Next...</span>
+                <span id="auto-next-status" class="text-xs text-emerald-500 font-bold animate-pulse hidden">✨ Meow! Qua môn (>80%)! Đang chuyển câu...</span>
                 <button onclick="changeSentence()" class="text-xs dynamic-text-primary opacity-80 dynamic-text-hover font-bold ml-auto transition-colors">
                     Next Sentence 🐾
                 </button>
@@ -359,18 +359,58 @@
         }
         animateBackground();
 
-        // --- BỘ DỮ LIỆU CÂU TIẾNG ANH GIAO TIẾP THÔNG DỤNG ---
+        // --- BỘ DỮ LIỆU ĐÃ ĐƯỢC CẬP NHẬT IPA & TIẾNG VIỆT (SỬA LỖI CHÍNH TẢ) ---
         const englishSentences = [
-            { text: "The air in the countryside is fresh." },
-            { text: "I can see a lot of green fields" },
-            { text: "Neighbors always help each other" },
-            { text: "We enjoy homegrown vegetbales" },
-            { text: "The night sky is full of stars" },
-            { text: "I love to the birds singing" },
-            { text: "The river looks beautiful at sunset" },
-            { text: "Farmers work hard on their farms" },
-            { text: "The lifestyle in rural is very simple" },
-            { text: "It is a great place to escape the city" }
+            { 
+                text: "The air in the countryside is fresh.", 
+                ipa: "/ði ɛr ɪn ðə ˈkʌntriˌsaɪd ɪz frɛʃ/", 
+                translation: "Không khí ở vùng quê thật trong lành." 
+            },
+            { 
+                text: "I can see a lot of green fields.", 
+                ipa: "/aɪ kæn si ə lɑt ʌv ɡrin fildz/", 
+                translation: "Tôi có thể nhìn thấy rất nhiều cánh đồng xanh bát ngát." 
+            },
+            { 
+                text: "Neighbors always help each other.", 
+                ipa: "/ˈneɪbərz ˈɔlˌweɪz hɛlp iʧ ˈʌðər/", 
+                translation: "Hàng xóm láng giềng luôn luôn giúp đỡ lẫn nhau." 
+            },
+            { 
+                text: "We enjoy homegrown vegetables.", 
+                ipa: "/wi ɛnˈʤɔɪ ˈhoʊmˈɡroʊn ˈvɛʤtəbəlz/", 
+                translation: "Chúng tôi thích ăn những loại rau củ tự trồng nhà làm." 
+            },
+            { 
+                text: "The night sky is full of stars.", 
+                ipa: "/ðə naɪt skaɪ ɪz fʊl ʌv stɑrz/", 
+                translation: "Bầu trời đêm ngập tràn những ánh sao." 
+            },
+            { 
+                text: "I love to hear the birds singing.", 
+                ipa: "/aɪ lʌv tu hir ðə bərdz ˈsɪŋɪŋ/", 
+                translation: "Tôi thích lắng nghe tiếng chim hót líu lo." 
+            },
+            { 
+                text: "The river looks beautiful at sunset.", 
+                ipa: "/ðə ˈrɪvər lʊks ˈbjutəfəl æt ˈsʌnˌsɛt/", 
+                translation: "Dòng sông trông thật đẹp khi hoàng hôn buông xuống." 
+            },
+            { 
+                text: "Farmers work hard on their farms.", 
+                ipa: "/ˈfɑrmərz wərk hɑrd ɑn ðɛr fɑrmz/", 
+                translation: "Những người nông dân làm việc chăm chỉ trên trang trại của họ." 
+            },
+            { 
+                text: "The lifestyle in rural areas is very simple.", 
+                ipa: "/ðə ˈlaɪfˌstaɪl ɪn ˈrʊrəl ˈɛriəz ɪz ˈvɛri ˈsɪmpəl/", 
+                translation: "Lối sống ở các vùng nông thôn rất giản dị." 
+            },
+            { 
+                text: "It is a great place to escape the city.", 
+                ipa: "/ɪt ɪz ə ɡreɪt pleɪs tu ɪˈskeɪp ðə ˈsɪti/", 
+                translation: "Nơi đây là một địa điểm tuyệt vời để trốn khỏi thành thị ồn ào." 
+            }
         ];
 
         let currentSentenceIndex = 0;
@@ -391,7 +431,7 @@
 
         function updateUIWithSentence(index) {
             const current = englishSentences[index];
-            ipaTextElem.innerText = current.ipa;
+            ipaTextElem.innerText = `IPA: ${current.ipa}`;
             targetTextElem.innerText = current.text;
             translationTextElem.innerText = `Nghĩa: ${current.translation}`;
             progressTextElem.innerText = `Sentence ${index + 1}/${englishSentences.length}`;
@@ -411,7 +451,7 @@
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
             recognition.continuous = false; 
-            recognition.lang = 'en-US'; // CHUYỂN SANG NHẬN DIỆN TIẾNG ANH CHUẨN MỸ 🇺🇸
+            recognition.lang = 'en-US'; // NHẬN DIỆN TIẾNG ANH CHUẨN MỸ 🇺🇸
             recognition.interimResults = false; 
 
             recognition.onstart = () => {
@@ -450,20 +490,34 @@
             alert("Trình duyệt không hỗ trợ Web Speech API. Hãy dùng Google Chrome hoặc Microsoft Edge nhé!");
         }
 
-        // --- PHÁT ÂM TIẾNG ANH MẪU ---
+        // --- PHÁT ÂM GIỌNG NỮ MẪU CHẬM RÃI ---
         function speakCurrentSentence(callback) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel(); 
                 
                 const targetObj = englishSentences[currentSentenceIndex];
                 const utterance = new SpeechSynthesisUtterance(targetObj.text);
-                utterance.lang = 'en-US'; // PHÁT ÂM GIỌNG TIẾNG ANH CHUẨN MỸ
-                utterance.rate = 0.85;    // Tốc độ vừa phải để dễ học theo
+                utterance.lang = 'en-US'; 
+                utterance.rate = 0.70;    // Đọc chậm rãi (Mức cũ là 0.85)
+
+                // Tìm giọng nữ tiếng Anh (Ưu tiên Google US English Nữ hoặc giọng có keyword Zira, female, natural)
+                const voices = window.speechSynthesis.getVoices();
+                let femaleVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Google US English')) ||
+                                  voices.find(voice => voice.lang.startsWith('en') && (voice.name.toLowerCase().includes('zira') || voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('natural') || voice.name.toLowerCase().includes('samantha')));
+                
+                // Nếu không tìm thấy các option tối ưu trên, lấy bừa 1 giọng nữ bất kỳ trong hệ thống tiếng Anh
+                if (!femaleVoice) {
+                    femaleVoice = voices.find(voice => voice.lang.startsWith('en'));
+                }
+                
+                if (femaleVoice) {
+                    utterance.voice = femaleVoice;
+                }
 
                 utterance.onstart = () => {
                     isSpeakingSample = true;
                     clearButtonEffects();
-                    statusElem.innerText = "Mèo đang đọc mẫu tiếng Anh... Hãy lắng nghe 🔊";
+                    statusElem.innerText = "Mèo đang đọc mẫu (Giọng Nữ Chậm)... Hãy lắng nghe 🔊";
                     btnText.innerText = "SPEAKING";
                     btnRecord.style.backgroundColor = "#a855f7"; 
                     btnRecord.classList.add('animate-bounce'); 
@@ -491,6 +545,11 @@
             }
         }
 
+        // Để tránh lỗi một số trình duyệt không tải danh sách voice ngay lập tức
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => {};
+        }
+
         function handleCatButtonClick() {
             if (!recognition) return;
             if (isListening) {
@@ -502,7 +561,7 @@
             speakCurrentSentence(() => {
                 setTimeout(() => {
                      recognition.start();
-                }, 500); // Trễ một chút sau khi đọc mẫu để chuẩn bị ghi âm
+                }, 600); // Trễ một chút sau khi đọc mẫu để sen chuẩn bị phát âm
             });
         }
 
@@ -523,7 +582,7 @@
             statusElem.innerText = "Nhấn đầu mèo nghe đọc mẫu, sau đó đọc lại nhé sen!";
         }
 
-        // Loại bỏ ký tự đặc biệt, dấu câu và chuyển thành chữ thường để so sánh chính xác các từ
+        // Loại bỏ ký tự đặc biệt, dấu câu để so sánh chính xác
         function cleanEnglishWords(text) {
             return text.toLowerCase()
                        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
@@ -531,7 +590,7 @@
                        .filter(word => word.length > 0);
         }
 
-        // --- CHẤM ĐIỂM THEO TỪNG TỪ TIẾNG ANH ---
+        // --- CHẤM ĐIỂM DỄ HƠN (>= 80% LÀ PASS) ---
         function evaluatePronunciation(target, spoken) {
             const targetWords = cleanEnglishWords(target);
             const spokenWords = cleanEnglishWords(spoken);
@@ -547,11 +606,9 @@
             let correctCount = 0;
             let htmlAnalysis = [];
             
-            // So sánh từng từ trong câu gốc tiếng Anh
             const originalWords = target.split(/\s+/);
             
             originalWords.forEach((word) => {
-                // Làm sạch từ hiện tại để check xem có nằm trong mảng từ nói không
                 const cleanW = word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
                 
                 if (spokenWords.includes(cleanW)) {
@@ -570,8 +627,9 @@
 
             clearButtonEffects();
 
-            if (scorePercentage >= 85) { // Đạt từ 85% trở lên là quá đỉnh đối với tiếng Anh giao tiếp
-                statusElem.innerText = "Meow meo! Bạn phát âm chuẩn xác lắm! 🎉";
+            // Chấm điểm dễ hơn: Chỉ cần đạt trên hoặc bằng 80% là pass (bản cũ yêu cầu 85%)
+            if (scorePercentage >= 80) { 
+                statusElem.innerText = "Meow meo! Bạn phát âm đạt chuẩn rồi! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
                 btnRecord.classList.add('shadow-[0_0_25px_rgba(244,31,95,0.85)]', 'ring-rose-500');
                 
@@ -582,7 +640,7 @@
                     changeSentence();
                 }, 3000);
             } else {
-                statusElem.innerText = "Chưa chuẩn rồi! Nghe lại mẫu và thử lại nhé~";
+                statusElem.innerText = "Chưa đủ 80% rồi! Nghe lại mẫu và thử lại nhé~";
                 setTimeout(() => {
                     btnRecord.classList.add('animate-shake');
                 }, 10);
