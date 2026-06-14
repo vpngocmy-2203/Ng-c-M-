@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meow HSK1 Pronunciation Coach 🐾</title>
+    <title>Meow English Pronunciation Coach 🐾</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght=500;700&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
         .correct { color: #10B981; font-weight: bold; }
         .incorrect { color: #EF4444; font-weight: bold; text-decoration: line-through; }
         
-        /* Hiệu ứng tai mèo sử dụng biến màu border động để đồng bộ màu */
+        /* Hiệu ứng tai mèo */
         .cat-box::before {
             content: "▲";
             color: white;
@@ -42,12 +42,12 @@
             right: 40px;
         }
 
-        /* --- CSS TẠO HÌNH ĐẦU MÈO CHO NÚT BẤM --- */
+        /* --- CSS TẠO HÌNH ĐẦU MÈO --- */
         .cat-head-btn {
             position: relative;
             width: 120px;
             height: 100px;
-            background-color: var(--theme-btn-default); /* Đồng bộ màu theo biến */
+            background-color: var(--theme-btn-default);
             border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -59,7 +59,6 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* Tai mèo bên trái và bên phải */
         .cat-head-btn::before, .cat-head-btn::after {
             content: "";
             position: absolute;
@@ -71,17 +70,13 @@
             z-index: -1;
             transition: all 0.3s ease;
         }
-        .cat-head-btn::before {
-            left: 6px;
-            transform: rotate(-35deg);
-        }
+        .cat-head-btn::before { left: 6px; transform: rotate(-35deg); }
         .cat-head-btn::after {
             right: 6px;
             transform: rotate(35deg);
             border-radius: 70% 30% 70% 30% / 70% 30% 70% 30%;
         }
 
-        /* Chi tiết mắt và râu bên trong mặt mèo */
         .cat-eyes {
             position: absolute;
             top: 32px;
@@ -109,17 +104,13 @@
         .cat-whiskers-l { left: -10px; transform: rotate(10deg); box-shadow: 0 8px 0 rgba(255, 255, 255, 0.6); }
         .cat-whiskers-r { right: -10px; transform: rotate(-10deg); box-shadow: 0 8px 0 rgba(255, 255, 255, 0.6); }
 
-        /* --- HIỆU ỨNG LẮC LƯ KHI PHÁT ÂM CHƯA CHUẨN --- */
         @keyframes meow-shake {
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-6px) rotate(-3deg); }
             40%, 80% { transform: translateX(6px) rotate(3deg); }
         }
-        .animate-shake {
-            animation: meow-shake 0.4s ease-in-out;
-        }
+        .animate-shake { animation: meow-shake 0.4s ease-in-out; }
 
-        /* Lớp màu động ép buộc theo biến CSS */
         .dynamic-text-primary { color: var(--theme-primary) !important; }
         .dynamic-text-hover:hover { color: var(--theme-primary-hover) !important; }
         .dynamic-bg-light { background-color: var(--theme-light) !important; }
@@ -159,29 +150,29 @@
         
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-xl font-bold dynamic-text-primary flex items-center gap-1.5">
-                <span>🐱</span> Meow HSK1 Coach
+                <span>🐱</span> Meow English Coach
             </h1>
-            <span id="progress-text" class="text-xs dynamic-bg-light dynamic-text-primary px-3 py-1 rounded-full font-bold shadow-xs">Câu 1/10</span>
+            <span id="progress-text" class="text-xs dynamic-bg-light dynamic-text-primary px-3 py-1 rounded-full font-bold shadow-xs">Sentence 1/10</span>
         </div>
         
         <div class="mb-6">
             <div class="flex justify-between items-center mb-1">
-                <p class="text-xs dynamic-text-primary opacity-80 font-bold flex items-center gap-1">🐾 Thử thách phát âm HSK1:</p>
+                <p class="text-xs dynamic-text-primary opacity-80 font-bold flex items-center gap-1">🐾 English Speaking Challenge:</p>
                 <button onclick="speakCurrentSentence()" class="text-xs dynamic-text-primary dynamic-text-hover font-bold flex items-center gap-0.5 transition-colors">
-                    🔊 Nghe mẫu
+                    🔊 Listen Model
                 </button>
             </div>
             
             <div class="dynamic-bg-light p-4 rounded-2xl border-2 border-dashed dynamic-border-theme min-h-[100px] flex flex-col justify-center relative">
-                <div id="pinyin-text" class="text-xs font-bold text-gray-400 tracking-wider mb-0.5">loading...</div>
-                <div id="target-text" class="text-2xl font-bold text-gray-800 tracking-wide mb-1">Loading...</div>
+                <div id="ipa-text" class="text-xs font-bold text-gray-400 tracking-wider mb-0.5">loading...</div>
+                <div id="target-text" class="text-xl font-bold text-gray-800 tracking-wide mb-1">Loading...</div>
                 <div id="translation-text" class="text-xs text-gray-500 italic">loading...</div>
             </div>
 
             <div class="flex justify-between items-center mt-2">
-                <span id="auto-next-status" class="text-xs text-emerald-500 font-bold animate-pulse hidden">✨ Meo! Xuất sắc >90%! Đổi câu...</span>
+                <span id="auto-next-status" class="text-xs text-emerald-500 font-bold animate-pulse hidden">✨ Meow! Perfect >90%! Next...</span>
                 <button onclick="changeSentence()" class="text-xs dynamic-text-primary opacity-80 dynamic-text-hover font-bold ml-auto transition-colors">
-                    Next câu khác 🐾
+                    Next Sentence 🐾
                 </button>
             </div>
         </div>
@@ -196,10 +187,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-4 mb-0.5 z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                     </svg>
-                    <span id="btn-text" class="text-[9px] font-black tracking-wider z-10 uppercase">BẤM HỌC</span>
+                    <span id="btn-text" class="text-[9px] font-black tracking-wider z-10 uppercase">TAP TO LEARN</span>
                 </button>
             </div>
-            <p id="status" class="text-xs dynamic-text-primary font-bold text-center mt-3 dynamic-bg-light/80 px-4 py-1 rounded-full">Nhấn đầu mèo, mèo sẽ đọc mẫu rồi sen đọc theo nhé!</p>
+            <p id="status" class="text-xs dynamic-text-primary font-bold text-center mt-3 dynamic-bg-light/80 px-4 py-1 rounded-full">Nhấn đầu mèo nghe đọc mẫu, sau đó đọc lại nhé sen!</p>
         </div>
 
         <div class="space-y-4 pt-4 border-t-2 border-dashed dynamic-border-theme">
@@ -209,7 +200,7 @@
             </div>
             
             <div>
-                <p class="text-xs text-gray-400 font-bold">Mèo sửa lỗi (so sánh chữ Hán):</p>
+                <p class="text-xs text-gray-400 font-bold">Mèo sửa lỗi (so sánh từ):</p>
                 <div id="analysis-text" class="text-base min-h-[24px] bg-gray-50/50 p-2 rounded-xl border border-gray-100 mt-1">—</div>
             </div>
 
@@ -226,11 +217,11 @@
     </div>
 
     <script>
-        // --- ĐỊNH NGHĨA BỘ THEME MÀU PASTEL DỄ THƯƠNG ---
+        // --- THEME MÀU PASTEL ---
         const themes = {
             pink: {
                 bgClass: 'bg-pink-100/60',
-                canvasColors: ['🐱', '🐾', '🐈', '😸', '😻', '😽', '🇨🇳', '✨'],
+                canvasColors: ['🐱', '🐾', '🐈', '🇺🇸', '🇬🇧', '✨', '🎵'],
                 colors: {
                     '--theme-primary': '#ec4899',
                     '--theme-primary-hover': '#be185d',
@@ -242,7 +233,7 @@
             },
             purple: {
                 bgClass: 'bg-purple-100/60',
-                canvasColors: ['🔮', '🐾', '🐈', '🪻', '🦄', '✨', '🪐', '🍬', '🎵'],
+                canvasColors: ['🔮', '🐾', '🐈', '✨', '🪐', '🍬', '🎵'],
                 colors: {
                     '--theme-primary': '#a855f7',
                     '--theme-primary-hover': '#7e22ce',
@@ -254,7 +245,7 @@
             },
             green: {
                 bgClass: 'bg-emerald-100/60',
-                canvasColors: ['🌱', '🐾', '🍀', '🍏', '✨', '🍵', '🌲'],
+                canvasColors: ['🌱', '🐾', '🍀', '✨', '🍵', '🍏'],
                 colors: {
                     '--theme-primary': '#10b981',
                     '--theme-primary-hover': '#047857',
@@ -266,7 +257,7 @@
             },
             yellow: {
                 bgClass: 'bg-amber-100/50',
-                canvasColors: ['🐥', '🐾', '🐱', '🍋', '🥞', '✨', '🧀', '🌟', '🍯'],
+                canvasColors: ['🐥', '🐾', '🐱', '🌟', '🥞', '✨', '🍯'],
                 colors: {
                     '--theme-primary': '#f59e0b',
                     '--theme-primary-hover': '#b45309',
@@ -281,8 +272,7 @@
         let currentTheme = 'pink';
 
         function toggleThemeMenu() {
-            const menu = document.getElementById('theme-menu');
-            menu.classList.toggle('hidden');
+            document.getElementById('theme-menu').classList.toggle('hidden');
         }
 
         function changeTheme(themeName) {
@@ -308,7 +298,7 @@
             }
         });
 
-        // --- SCRIPT HOẠT HỌA ICON TRÊN BACKGROUND ---
+        // --- BACKGROUND CANVASES ---
         const canvas = document.getElementById('cat-bg-canvas');
         const ctxBg = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
@@ -360,41 +350,35 @@
             }
         }
 
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new CatParticle());
-        }
+        for (let i = 0; i < particleCount; i++) { particles.push(new CatParticle()); }
 
         function animateBackground() {
             ctxBg.clearRect(0, 0, width, height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            particles.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animateBackground);
         }
         animateBackground();
 
-        // --- BỘ DỮ LIỆU TIẾNG TRUNG HSK1 CHUẨN ---
-        const hsk1Sentences = [
-            { hanzi: "你好", pinyin: "nǐ hǎo", translation: "Chào bạn!" },
-            { hanzi: "谢谢你", pinyin: "xièxie nǐ", translation: "Cám ơn bạn." },
-            { hanzi: "我想喝茶", pinyin: "wǒ xiǎng hē chá", translation: "Tôi muốn uống trà." },
-            { hanzi: "他是谁", pinyin: "tā shì shéi", translation: "Anh ấy là ai?" },
-            { hanzi: "我喜欢猫", pinyin: "wǒ xǐhuan māo", translation: "Tôi thích mèo." },
-            { hanzi: "现在几点", pinyin: "xiànzài jǐ diǎn", translation: "Bây giờ là mấy giờ?" },
-            { hanzi: "今天天气很好", pinyin: "jīntiān tiānqì hěn hǎo", translation: "Hôm nay thời tiết rất đẹp." },
-            { hanzi: "苹果多少钱", pinyin: "píngguǒ duōshao qián", translation: "Táo bao nhiêu tiền?" },
-            { hanzi: "我坐飞机去北京", pinyin: "wǒ zuò fēijī qù Běijīng", translation: "Tôi đi máy bay đến Bắc Kinh." },
-            { hanzi: "你会 nói tiếng Trung 吗", hanzi_fixed: "你会说汉语吗", pinyin: "nǐ huì shuō Hànyǔ ma", translation: "Bạn biết nói tiếng Trung không?" }
+        // --- BỘ DỮ LIỆU CÂU TIẾNG ANH GIAO TIẾP THÔNG DỤNG ---
+        const englishSentences = [
+            { text: "Hello, nice to meet you.", ipa: "/həˈloʊ, naɪs tu miːt ju/", translation: "Xin chào, rất vui được gặp bạn." },
+            { text: "How are you doing today?", ipa: "/haʊ ɑːr ju ˈduːɪŋ təˈdeɪ/", translation: "Hôm nay bạn thế nào?" },
+            { text: "Thank you so much for your help.", ipa: "/θæŋk ju soʊ mʌtʃ fɔːr jɔːr help/", translation: "Cảm ơn bạn rất nhiều vì đã giúp đỡ." },
+            { text: "Where is the nearest bus station?", ipa: "/wer ɪz ðə ˈnɪrəst bʌs ˈsteɪʃn/", translation: "Trạm xe buýt gần nhất ở đâu?" },
+            { text: "I love listening to music.", ipa: "/aɪ lʌv ˈlɪsnɪŋ tu ˈmjuːzɪk/", translation: "Tôi thích nghe nhạc." },
+            { text: "What is your favorite food?", ipa: "/wʌt ɪz jɔːr ˈfeɪvərɪt fuːd/", translation: "Món ăn yêu thích của bạn là gì?" },
+            { text: "It is a beautiful day today.", ipa: "/ɪt ɪz ə ˈbjuːtɪfl deɪ təˈdeɪ/", translation: "Hôm nay là một ngày đẹp trời." },
+            { text: "Could you please repeat that?", ipa: "/kʊd ju pliːz rɪˈpiːt ðæt/", translation: "Bạn có thể vui lòng nhắc lại điều đó không?" },
+            { text: "I am learning English every day.", ipa: "/aɪ æm ˈlɜːrnɪŋ ˈɪŋɡlɪʃ ˈevri deɪ/", translation: "Tôi học tiếng Anh mỗi ngày." },
+            { text: "Have a wonderful weekend.", ipa: "/hæv ə ˈwʌndərfl ˈwiːkend/", translation: "Chúc bạn một cuối tuần tuyệt vời." }
         ];
 
         let currentSentenceIndex = 0;
         let autoNextTimeout = null; 
 
-        const pinyinTextElem = document.getElementById('pinyin-text');
+        const ipaTextElem = document.getElementById('ipa-text');
         const targetTextElem = document.getElementById('target-text');
         const translationTextElem = document.getElementById('translation-text');
-        
         const progressTextElem = document.getElementById('progress-text');
         const autoNextStatusElem = document.getElementById('auto-next-status');
         const btnRecord = document.getElementById('btn-record');
@@ -405,13 +389,12 @@
         const scoreBar = document.getElementById('score-bar');
         const scoreText = document.getElementById('score-text');
 
-        // Hàm cập nhật giao diện câu hỏi
         function updateUIWithSentence(index) {
-            const current = hsk1Sentences[index];
-            pinyinTextElem.innerText = current.pinyin;
-            targetTextElem.innerText = current.hanzi;
+            const current = englishSentences[index];
+            ipaTextElem.innerText = current.ipa;
+            targetTextElem.innerText = current.text;
             translationTextElem.innerText = `Nghĩa: ${current.translation}`;
-            progressTextElem.innerText = `Câu ${index + 1}/${hsk1Sentences.length}`;
+            progressTextElem.innerText = `Sentence ${index + 1}/${englishSentences.length}`;
         }
 
         updateUIWithSentence(currentSentenceIndex);
@@ -428,7 +411,7 @@
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
             recognition.continuous = false; 
-            recognition.lang = 'zh-CN'; // CHUYỂN SANG NHẬN DIỆN TIẾNG TRUNG 🇨🇳
+            recognition.lang = 'en-US'; // CHUYỂN SANG NHẬN DIỆN TIẾNG ANH CHUẨN MỸ 🇺🇸
             recognition.interimResults = false; 
 
             recognition.onstart = () => {
@@ -437,8 +420,8 @@
                 autoNextStatusElem.classList.add('hidden');
                 clearButtonEffects();
 
-                statusElem.innerText = "Mèo đang nghe tiếng Trung... Đọc đi sen! 🐱";
-                btnText.innerText = "ĐANG NGHE";
+                statusElem.innerText = "Mèo đang nghe tiếng Anh... Đọc đi sen! 🐱";
+                btnText.innerText = "LISTENING";
                 btnRecord.style.backgroundColor = "#f43f5e"; 
                 btnRecord.classList.remove('ring-pink-100');
                 btnRecord.classList.add('animate-pulse', 'ring-rose-100');
@@ -447,7 +430,7 @@
             recognition.onend = () => {
                 isListening = false;
                 statusElem.innerText = "Mèo đang chấm điểm nha...";
-                btnText.innerText = "BẤM HỌC";
+                btnText.innerText = "TAP TO LEARN";
                 btnRecord.style.backgroundColor = ""; 
                 btnRecord.classList.remove('animate-pulse', 'ring-rose-100');
             };
@@ -456,10 +439,8 @@
                 const speechToText = event.results[0][0].transcript;
                 resultTextElem.innerText = speechToText;
                 
-                // Lấy chuỗi gốc để so sánh (ưu tiên chuỗi đã sửa chữa nếu có từ đặc biệt)
-                const targetObj = hsk1Sentences[currentSentenceIndex];
-                const realTarget = targetObj.hanzi_fixed || targetObj.hanzi;
-                evaluatePronunciation(realTarget, speechToText);
+                const targetObj = englishSentences[currentSentenceIndex];
+                evaluatePronunciation(targetObj.text, speechToText);
             };
 
             recognition.onerror = (event) => {
@@ -469,23 +450,21 @@
             alert("Trình duyệt không hỗ trợ Web Speech API. Hãy dùng Google Chrome hoặc Microsoft Edge nhé!");
         }
 
-        // PHÁT ÂM MẪU GIỌNG TIẾNG TRUNG CHUẨN
+        // --- PHÁT ÂM TIẾNG ANH MẪU ---
         function speakCurrentSentence(callback) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel(); 
                 
-                const targetObj = hsk1Sentences[currentSentenceIndex];
-                const realTarget = targetObj.hanzi_fixed || targetObj.hanzi;
-                
-                const utterance = new SpeechSynthesisUtterance(realTarget);
-                utterance.lang = 'zh-CN'; // GIỌNG TRUNG QUỐC PHỔ THÔNG
-                utterance.rate = 0.75;    // Đọc hơi chậm một chút để dễ nghe các thanh điệu (tones)
+                const targetObj = englishSentences[currentSentenceIndex];
+                const utterance = new SpeechSynthesisUtterance(targetObj.text);
+                utterance.lang = 'en-US'; // PHÁT ÂM GIỌNG TIẾNG ANH CHUẨN MỸ
+                utterance.rate = 0.85;    // Tốc độ vừa phải để dễ học theo
 
                 utterance.onstart = () => {
                     isSpeakingSample = true;
                     clearButtonEffects();
-                    statusElem.innerText = "Mèo đang đọc mẫu tiếng Trung... Hãy lắng nghe 🔊";
-                    btnText.innerText = "MÈO ĐANG ĐỌC";
+                    statusElem.innerText = "Mèo đang đọc mẫu tiếng Anh... Hãy lắng nghe 🔊";
+                    btnText.innerText = "SPEAKING";
                     btnRecord.style.backgroundColor = "#a855f7"; 
                     btnRecord.classList.add('animate-bounce'); 
                 };
@@ -494,7 +473,7 @@
                     isSpeakingSample = false;
                     btnRecord.classList.remove('animate-bounce');
                     btnRecord.style.backgroundColor = "";
-                    btnText.innerText = "BẤM HỌC";
+                    btnText.innerText = "TAP TO LEARN";
                     if (callback) callback(); 
                 };
 
@@ -502,7 +481,7 @@
                     isSpeakingSample = false;
                     btnRecord.classList.remove('animate-bounce');
                     btnRecord.style.backgroundColor = "";
-                    btnText.innerText = "BẤM HỌC";
+                    btnText.innerText = "TAP TO LEARN";
                     if (callback) callback();
                 };
 
@@ -521,10 +500,9 @@
             if (isSpeakingSample) return;
 
             speakCurrentSentence(() => {
-                // Đợi mèo đọc xong 1 giây rồi tự động kích hoạt chế độ lắng nghe ghi âm
                 setTimeout(() => {
                      recognition.start();
-                }, 400);
+                }, 500); // Trễ một chút sau khi đọc mẫu để chuẩn bị ghi âm
             });
         }
 
@@ -535,27 +513,30 @@
             
             clearButtonEffects();
 
-            currentSentenceIndex = (currentSentenceIndex + 1) % hsk1Sentences.length;
+            currentSentenceIndex = (currentSentenceIndex + 1) % englishSentences.length;
             updateUIWithSentence(currentSentenceIndex);
             
             resultTextElem.innerText = "—";
             analysisElem.innerHTML = "—";
             scoreBar.style.width = "0%";
             scoreText.innerText = "0%";
-            statusElem.innerText = "Nhấn đầu mèo, mèo sẽ đọc mẫu rồi sen đọc theo nhé!";
+            statusElem.innerText = "Nhấn đầu mèo nghe đọc mẫu, sau đó đọc lại nhé sen!";
         }
 
-        // Bộ làm sạch ký tự thừa khi so sánh tiếng Trung
-        function cleanChinese(text) {
-            return text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?，。！？；：、（）“”]/g, "").trim();
+        // Loại bỏ ký tự đặc biệt, dấu câu và chuyển thành chữ thường để so sánh chính xác các từ
+        function cleanEnglishWords(text) {
+            return text.toLowerCase()
+                       .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
+                       .split(/\s+/)
+                       .filter(word => word.length > 0);
         }
 
-        // HÀM CHẤM ĐIỂM PHÁT ÂM TIẾNG TRUNG (So sánh ký tự Hanzi)
+        // --- CHẤM ĐIỂM THEO TỪNG TỪ TIẾNG ANH ---
         function evaluatePronunciation(target, spoken) {
-            const cleanT = cleanChinese(target);
-            const cleanS = cleanChinese(spoken);
+            const targetWords = cleanEnglishWords(target);
+            const spokenWords = cleanEnglishWords(spoken);
             
-            if (!cleanS) {
+            if (spokenWords.length === 0) {
                 analysisElem.innerHTML = `<span class="incorrect">${target}</span>`;
                 scoreBar.style.width = "0%";
                 scoreText.innerText = "0%";
@@ -566,28 +547,31 @@
             let correctCount = 0;
             let htmlAnalysis = [];
             
-            // Tách từng chữ Hán đơn lẻ để so sánh trực quan
-            const targetChars = cleanT.split("");
+            // So sánh từng từ trong câu gốc tiếng Anh
+            const originalWords = target.split(/\s+/);
             
-            targetChars.forEach((char) => {
-                if (cleanS.includes(char)) {
-                    htmlAnalysis.push(`<span class="correct">${char}</span>`);
+            originalWords.forEach((word) => {
+                // Làm sạch từ hiện tại để check xem có nằm trong mảng từ nói không
+                const cleanW = word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+                
+                if (spokenWords.includes(cleanW)) {
+                    htmlAnalysis.push(`<span class="correct">${word}</span>`);
                     correctCount++;
                 } else {
-                    htmlAnalysis.push(`<span class="incorrect">${char}</span>`);
+                    htmlAnalysis.push(`<span class="incorrect">${word}</span>`);
                 }
             });
 
-            const scorePercentage = Math.round((correctCount / targetChars.length) * 100);
+            const scorePercentage = Math.round((correctCount / targetWords.length) * 100);
 
-            analysisElem.innerHTML = htmlAnalysis.join("");
+            analysisElem.innerHTML = htmlAnalysis.join(" ");
             scoreBar.style.width = `${scorePercentage}%`;
             scoreText.innerText = `${scorePercentage}%`;
 
             clearButtonEffects();
 
-            if (scorePercentage >= 90) {
-                statusElem.innerText = "Meo meo! Bạn phát âm chuẩn xác lắm! 🎉";
+            if (scorePercentage >= 85) { // Đạt từ 85% trở lên là quá đỉnh đối với tiếng Anh giao tiếp
+                statusElem.innerText = "Meow meo! Bạn phát âm chuẩn xác lắm! 🎉";
                 autoNextStatusElem.classList.remove('hidden');
                 btnRecord.classList.add('shadow-[0_0_25px_rgba(244,31,95,0.85)]', 'ring-rose-500');
                 
@@ -606,7 +590,7 @@
             }
         }
 
-        // TỰ ĐỘNG TẠO NHẠC SÚNG/TIẾNG MÈO BẰNG AUDIO CONTEXT
+        // ÂM THANH MÈO PHÁT RA TỰ ĐỘNG
         function playMeowSound(type = 'meow') {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -633,7 +617,7 @@
                     osc.start(now);
                     osc.stop(now + 0.4);
                     
-                } else { // Tiếng mèo gừ giận hờn dỗi
+                } else { 
                     const osc = ctx.createOscillator();
                     const modulator = ctx.createOscillator();
                     const modGain = ctx.createGain();
@@ -676,20 +660,16 @@
             const animationEnd = Date.now() + duration;
             const defaults = { startVelocity: 25, spread: 360, ticks: 50, zIndex: 99, colors: ['#ffb7b2', '#ffdac1', '#e2f0cb', '#b5ead7', '#ffffff'] };
 
-            function randomInRange(min, max) {
-                return Math.random() * (max - min) + min;
-            }
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
 
             const interval = setInterval(function() {
                 const timeLeft = animationEnd - Date.now();
                 if (timeLeft <= 0) return clearInterval(interval);
-
-                const particleCount = 30 * (timeLeft / duration);
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.4), y: Math.random() - 0.2 } }));
-                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.6, 0.9), y: Math.random() - 0.2 } }));
-            }, 220);
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
         }
     </script>
 </body>
-    <H1> Võ Phạm Ngọc Mỹ </H1>
 </html>
